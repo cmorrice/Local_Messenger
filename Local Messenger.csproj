@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <RootNamespace>Local_Messenger</RootNamespace>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Media\Images\cat.jpg" />
+    <None Remove="Media\Images\test.jpg" />
+    <None Remove="Media\Sounds\test.wav" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="MVVM\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Media\Images\cat.jpg" />
+    <Resource Include="Media\Images\test.jpg" />
+    <Resource Include="Media\Sounds\test.wav" />
+  </ItemGroup>
+
+</Project>

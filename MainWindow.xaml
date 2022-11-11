@@ -1,0 +1,95 @@
+﻿<Window x:Class="Local_Messenger.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Local_Messenger"
+        mc:Ignorable="d"
+        ResizeMode="CanResize"
+        WindowStartupLocation="CenterScreen"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid x:Name="BaseGrid"
+          Background="#212121">
+        <!--<Border Background="Transparent"
+                CornerRadius="40">
+            <Border.Effect>
+                <BlurEffect Radius="20" KernelType="Gaussian"/>
+            </Border.Effect>
+
+            <Border.Clip>
+                <RectangleGeometry RadiusX="40"
+                                   RadiusY="40"
+                                   Rect="0,0,1280,720"/>
+            </Border.Clip>
+        </Border> -->
+
+        <Grid x:Name="UI_Grid" ShowGridLines="True">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <TextBlock x:Name="Search_Box"
+                       Text="Search"
+                       FontSize="28"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Left"
+                       Foreground="White"
+                       Grid.Column="0"/>
+            
+            <TextBlock x:Name="Message_Name"
+                       Text="Message Name"
+                       FontSize="28"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Left"
+                       Foreground="White"
+                       Grid.Column="1"/>
+
+            <ListView x:Name="Chat_List"
+                      Grid.Row="1"
+                      Grid.Column="0"
+                      Background="Transparent"
+                      HorizontalContentAlignment="Stretch">
+                <!--<Grid HorizontalAlignment="Stretch" ShowGridLines="True">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.2*"/>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="1.2*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Pic" Foreground="White"/>
+                    <TextBlock Grid.Column ="1" Text="Message" Foreground="White"/>
+                    <TextBlock Grid.Column ="2" Text="Time" Foreground="White"/>
+                </Grid> -->
+            </ListView>
+
+            <Grid x:Name="Messages_Area"
+                  Grid.Column="1"
+                  Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition x:Name="Chat_Area"/>
+                    <RowDefinition x:Name="Chat_Box" Height="50"/>
+                </Grid.RowDefinitions>
+
+                <ListView x:Name="Messages_List"
+                          Grid.Row="0"
+                          Background="Transparent">
+                    <TextBlock Text="Message" Foreground="White"/>
+                </ListView>
+                
+                <TextBlock x:Name="Chat"
+                       Margin="5"
+                       Text="Chat Box"
+                       FontSize="28"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Left"
+                       Foreground="White"
+                       Grid.Row="1"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

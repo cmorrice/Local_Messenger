@@ -1,0 +1,35 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style TargetType="{x:Type MenuItem}"
+           x:Key="MenuItemBottomTheme">
+
+        <Style.Setters>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border CornerRadius="0,0,35,35"
+                                Background="{TemplateBinding Background}"
+                                Height="60">
+                            <TextBlock Text="{TemplateBinding Property=Header}"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       Padding="5,0,5,0"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <!-- set defaults -->
+            <Setter Property="Background" Value="#7AE0F7"/>
+        </Style.Setters>
+
+        <!-- Triggers will change stuff based off of data -->
+        <Style.Triggers>
+            <!-- While Clicking -->
+            <Trigger Property="IsMouseOver" Value="True">
+                <!-- change background to darker -->
+                <Setter Property="Background" Value="#3E717C"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>
