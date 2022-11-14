@@ -61,6 +61,11 @@ namespace Local_Messenger
             messages.Add(temp4);
 
             //messages.Sort();
+            Messages_List.Items.Add(new MessageListItem(new Message(me, temp2, "beep", DateTime.Now), me));
+            Message test = new Message(temp2, me, "hello", DateTime.Now);
+            Messages_List.Items.Add(new MessageListItem(test, me));
+
+            test.content = "frello";
 
             return messages;
         }

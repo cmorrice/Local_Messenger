@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
+using System.Windows.Media;
 
 namespace Local_Messenger
 {
@@ -39,30 +40,88 @@ namespace Local_Messenger
                 themes[index] = new Style(typeof(Button));
                 ControlTemplate template = new ControlTemplate(typeof(Button));
 
-                FrameworkElementFactory factory = new FrameworkElementFactory(typeof(Border));
-                factory.SetValue(Border.BackgroundProperty, Brushes.Green);
-                factory.SetValue(Border.CornerRadiusProperty, new CornerRadius(5, 10, 10, 5));
-                factory.SetValue(HeightProperty, 30);
+                FrameworkElementFactory border = new FrameworkElementFactory(typeof(Border));
+                border.SetValue(Border.HeightProperty, 30.0);
 
-                template.VisualTree = factory;
+                template.VisualTree = border;
 
-                factory.AppendChild(new FrameworkElementFactory(typeof(TextBlock)));
-                factory.FirstChild.SetValue(TextBlock.TextProperty, "Message");
-                factory.FirstChild.SetValue(TextBlock.VerticalAlignmentProperty, VerticalAlignment.Center);
-                factory.FirstChild.SetValue(TextBlock.HorizontalAlignmentProperty, HorizontalAlignment.Center);
-                factory.FirstChild.SetValue(TextBlock.PaddingProperty, new Thickness(5));
+                FrameworkElementFactory text = new FrameworkElementFactory(typeof(TextBlock));
+                border.AppendChild(text);
+                text.SetBinding(TextBlock.TextProperty, new Binding { RelativeSource = RelativeSource.TemplatedParent, Path = new PropertyPath("Content") });
+                text.SetValue(TextBlock.VerticalAlignmentProperty, VerticalAlignment.Center);
+                text.SetValue(TextBlock.HorizontalAlignmentProperty, HorizontalAlignment.Center);
+                text.SetValue(TextBlock.PaddingProperty, new Thickness(5));
+
+                // if sender
+                if (index <= (int) Themes.SenderSolo)
+                {
+                    border.SetValue(Border.HorizontalAlignmentProperty, HorizontalAlignment.Right);
+                    border.SetValue(Border.BackgroundProperty, Brushes.Violet);
+                    text.SetValue(TextBlock.ForegroundProperty, Brushes.Black);
+
+                }
+                else // if receiver
+                {
+                    border.SetValue(Border.HorizontalAlignmentProperty, HorizontalAlignment.Left);
+                    border.SetValue(Border.BackgroundProperty, Brushes.DarkSlateGray);
+                    text.SetValue(TextBlock.ForegroundProperty, Brushes.White);
+                }
+
+                switch (index)
+                {
+                    case (int)Themes.SenderTop:
+                        border.SetValue(Border.CornerRadiusProperty, new CornerRadius(10, 10, 10, 5));
+                        break;
+                    case (int)Themes.SenderMiddle:
+                        border.SetValue(Border.CornerRadiusProperty, new CornerRadius(5, 10, 10, 5));
+                        break;
+                    case (int)Themes.SenderBottom:
+                        border.SetValue(Border.CornerRadiusProperty, new CornerRadius(5, 10, 10, 10));
+                        break;
+                    case (int)Themes.SenderSolo:
+                        border.SetValue(Border.CornerRadiusProperty, new CornerRadius(10, 10, 10, 10));
+                        break;
+
+                    case (int)Themes.ReceiverTop:
+                        border.SetValue(Border.CornerRadiusProperty, new CornerRadius(10, 10, 5, 10));
+                        break;
+                    case (int)Themes.ReceiverMiddle:
+                        border.SetValue(Border.CornerRadiusProperty, new CornerRadius(10, 5, 5, 10));
+                        break;
+                    case (int)Themes.ReceiverBottom:
+                        border.SetValue(Border.CornerRadiusProperty, new CornerRadius(10, 5, 10, 10));
+                        break;
+                    case (int)Themes.ReceiverSolo:
+                        border.SetValue(Border.CornerRadiusProperty, new CornerRadius(10, 10, 10, 10));
+                        break;
+                }
 
                 themes[index].Setters.Add(new Setter { Property = Button.TemplateProperty, Value = template });
             }
         }
 
-
-        Message message;
-        public MessageListItem(Message thisMessage)
+        private MessageListItem(Message thisMessage)
         {
             message = thisMessage;
-            Text = message.content;
+            this.SetBinding(Button.ContentProperty, new Binding { Source = thisMessage, Path = new PropertyPath("content") });
+        }
 
+        Message message;
+        public MessageListItem(Message thisMessage, Person user) : this(thisMessage)
+        {
+            if (user == thisMessage.sender)
+            {
+                this.Style = themes[(int)Themes.SenderSolo];
+            }
+            else
+            {
+                this.Style = themes[(int)Themes.ReceiverSolo];
+            }
+        }
+
+        public MessageListItem(Message thisMessage, Themes style) : this(thisMessage)
+        {
+            this.Style = themes[(int)style];
         }
     }
 }
