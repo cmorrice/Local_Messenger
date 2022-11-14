@@ -10,6 +10,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
 
+
+
+
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
 namespace Local_Messenger
 {
     class ChatListItem : RadioButton
@@ -166,15 +174,25 @@ namespace Local_Messenger
             this.Cursor = Cursors.Hand;
             grid.Background = Brushes.Transparent; // needed so the cursor shows across the whole grid
             //this.Content = imageBorder;
-            // this.Click += new RoutedEventHandler(ChatListItemClicked);
-
+            this.Click += new RoutedEventHandler(OnChatClicked);
 
             // styles the button as a toggle button
             this.Margin = new Thickness(5);
             this.Style = buttonTheme;
+            
         }
 
-
+        private void OnChatClicked(object sender, RoutedEventArgs e)
+        {
+            if (sender == null)
+            {
+                return;
+            }
+            MainWindow mw = new MainWindow();
+            ChatListItem thisItem = sender as ChatListItem;
+            // change the messages shown
+            mw.Message_Name.Text = thisItem.Content as string;
+        }
         //public BitmapImage Convert(System.Drawing.Image img)
         //{
         //    using (var memory = new System.IO.MemoryStream())

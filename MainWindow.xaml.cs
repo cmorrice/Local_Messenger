@@ -31,6 +31,12 @@ namespace Local_Messenger
             {
                 Chat_List.Items.Add(new ChatListItem(person));
             }
+
+            foreach (Person person in chats)
+            {
+                MessageListItem.AddToListView(Messages_List, person.messages.ToArray(), me);
+                break;
+            }
         }
 
         List<Person> readSavedMessages()
@@ -46,6 +52,13 @@ namespace Local_Messenger
             temp2.addMessage(me, temp2, "dobre miejsce");
             temp2.addMessage(me, temp2, "spelled right pronounced wrong");
             temp2.addMessage(new Message(temp2, me, "this is ala's response", DateTime.Parse("11/10/2022 3:29:52 PM")));
+            temp2.addMessage(new Message(temp2, me, "middle ala", DateTime.Parse("11/10/2022 3:30:52 PM")));
+            temp2.addMessage(new Message(temp2, me, "end ala", DateTime.Parse("11/10/2022 3:31:52 PM")));
+            temp2.addMessage(new Message(me, temp2, "solo me", DateTime.Parse("11/10/2022 3:32:52 PM")));
+            temp2.addMessage(new Message(temp2, me, "solo ala", DateTime.Parse("11/10/2022 3:33:52 PM")));
+            temp2.addMessage(new Message(me, temp2, "top me", DateTime.Parse("11/10/2022 3:34:52 PM")));
+            temp2.addMessage(new Message(me, temp2, "middle me", DateTime.Parse("11/10/2022 3:35:52 PM")));
+            temp2.addMessage(new Message(me, temp2, "bottom me", DateTime.Parse("11/10/2022 3:36:52 PM")));
 
             Person temp3 = new Person("loseph", "Bing");
             temp3.addMessage(me, temp3, "jaeni");
@@ -61,13 +74,10 @@ namespace Local_Messenger
             messages.Add(temp4);
 
             //messages.Sort();
-            Messages_List.Items.Add(new MessageListItem(new Message(me, temp2, "beep", DateTime.Now), me));
-            Message test = new Message(temp2, me, "hello", DateTime.Now);
-            Messages_List.Items.Add(new MessageListItem(test, me));
-
-            test.content = "frello";
 
             return messages;
         }
+
+        
     }
 }

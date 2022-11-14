@@ -79,7 +79,7 @@
                           Grid.Row="0"
                           Background="Transparent"
                           HorizontalContentAlignment="Stretch">
-                    <Border Background="Green"
+                    <!-- <Border Background="Green"
                             CornerRadius="5, 10, 10, 5"
                             Height="30"
                             HorizontalAlignment="Left">
@@ -88,7 +88,7 @@
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    Padding="5"/>
-                    </Border>
+                    </Border> -->
                 </ListView>
                 
                 <TextBlock x:Name="Chat"

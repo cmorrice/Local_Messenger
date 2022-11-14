@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,10 +8,29 @@ using System.Windows.Media.Imaging;
 
 namespace Local_Messenger
 {
-    class Person
+    class Person : INotifyPropertyChanged
     {
-        public string name;
-        string hostName;
+        private string _name;
+        public string name
+        {
+            get => _name;
+            set
+            {
+                _name = value;
+                OnPropertyChanged("name");
+            }
+        }
+
+        private string _hostName;
+        public string hostName
+        {
+            get => _hostName;
+            set
+            {
+                _hostName = value;
+                OnPropertyChanged("hostName");
+            }
+        }
 
         public BitmapImage contactPhoto { get; }
 
@@ -43,6 +63,19 @@ namespace Local_Messenger
         public void addMessage(Message newMessage)
         {
             messages.Add(newMessage);
+        }
+
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged(string info)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(info));
+            }
         }
     }
 }
