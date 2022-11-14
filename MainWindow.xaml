@@ -71,14 +71,24 @@
                   Grid.Column="1"
                   Grid.Row="1">
                 <Grid.RowDefinitions>
-                    <RowDefinition x:Name="Chat_Area"/>
-                    <RowDefinition x:Name="Chat_Box" Height="50"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="50"/>
                 </Grid.RowDefinitions>
 
                 <ListView x:Name="Messages_List"
                           Grid.Row="0"
-                          Background="Transparent">
-                    <TextBlock Text="Message" Foreground="White"/>
+                          Background="Transparent"
+                          HorizontalContentAlignment="Stretch">
+                    <Border Background="Green"
+                            CornerRadius="5, 10, 10, 5"
+                            Height="30"
+                            HorizontalAlignment="Left">
+                        <TextBlock Text="Message"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Padding="5"/>
+                    </Border>
                 </ListView>
                 
                 <TextBlock x:Name="Chat"
