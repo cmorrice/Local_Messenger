@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Local_Messenger
 {
-    class Message : INotifyPropertyChanged
+    public class Message : INotifyPropertyChanged
     {
         public Person sender { get; }
         public Person receiver { get; }

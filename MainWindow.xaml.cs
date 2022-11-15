@@ -20,11 +20,13 @@ namespace Local_Messenger
     /// </summary>
     public partial class MainWindow : Window
     {
-        Person me = new Person("Me", "localhost");
+        public Person me;
         List<Person> chats;
         public MainWindow()
         {
             InitializeComponent();
+            me = new Person("Me", "localhost");
+            ChatListItem.window = this;
             chats = readSavedMessages();
 
             foreach (Person person in chats)
@@ -58,7 +60,7 @@ namespace Local_Messenger
             temp2.addMessage(new Message(temp2, me, "solo ala", DateTime.Parse("11/10/2022 3:33:52 PM")));
             temp2.addMessage(new Message(me, temp2, "top me", DateTime.Parse("11/10/2022 3:34:52 PM")));
             temp2.addMessage(new Message(me, temp2, "middle me", DateTime.Parse("11/10/2022 3:35:52 PM")));
-            temp2.addMessage(new Message(me, temp2, "bottom me", DateTime.Parse("11/10/2022 3:36:52 PM")));
+            temp2.addMessage(new Message(me, temp2, "bottom me", DateTime.Parse("11/14/2022 8:36:52 PM")));
 
             Person temp3 = new Person("loseph", "Bing");
             temp3.addMessage(me, temp3, "jaeni");

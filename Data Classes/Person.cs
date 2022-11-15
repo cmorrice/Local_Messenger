@@ -8,7 +8,7 @@ using System.Windows.Media.Imaging;
 
 namespace Local_Messenger
 {
-    class Person : INotifyPropertyChanged
+    public class Person : INotifyPropertyChanged
     {
         private string _name;
         public string name

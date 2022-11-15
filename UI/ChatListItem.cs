@@ -22,7 +22,10 @@ namespace Local_Messenger
 {
     class ChatListItem : RadioButton
     {
+        static public MainWindow window;
         static private Style buttonTheme { get; }
+
+        private Person person;
 
         static ChatListItem()
         {
@@ -36,6 +39,7 @@ namespace Local_Messenger
 
         public ChatListItem(Person thisPerson)
         {
+            this.person = thisPerson;
             // initialize each element
             Image facePic = new Image();
             Border imageBorder = new Border(); // image border
@@ -120,7 +124,6 @@ namespace Local_Messenger
                 {
                     timeBox.Text = timeStamp.ToString("d");
                 }
-                
             }
             else
             {
@@ -179,7 +182,6 @@ namespace Local_Messenger
             // styles the button as a toggle button
             this.Margin = new Thickness(5);
             this.Style = buttonTheme;
-            
         }
 
         private void OnChatClicked(object sender, RoutedEventArgs e)
@@ -188,10 +190,16 @@ namespace Local_Messenger
             {
                 return;
             }
-            MainWindow mw = new MainWindow();
+            TextBlock Message_Name = window.Message_Name;
+            ListView Message_List = window.Messages_List;
             ChatListItem thisItem = sender as ChatListItem;
             // change the messages shown
-            mw.Message_Name.Text = thisItem.Content as string;
+
+            Message_Name.Text = person.name;
+            Message_List.Items.Clear();
+
+            MessageListItem.AddToListView(Message_List, person.messages.ToArray(), window.me);
+            
         }
         //public BitmapImage Convert(System.Drawing.Image img)
         //{
