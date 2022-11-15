@@ -32,6 +32,17 @@ namespace Local_Messenger
             }
         }
 
+        private string _draft;
+        public string draft
+        {
+            get => _draft;
+            set
+            {
+                _draft = value;
+                OnPropertyChanged("draft");
+            }
+        }
+
         public BitmapImage contactPhoto { get; }
 
         public List<Message> messages { get; }

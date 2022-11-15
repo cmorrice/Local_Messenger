@@ -90,15 +90,22 @@
                                    Padding="5"/>
                     </Border> -->
                 </ListView>
-                
-                <TextBlock x:Name="Chat"
+
+                <Border Background="DarkSlateGray"
+                        Grid.Row="1"
+                        CornerRadius="10"
+                        Margin="5">
+                    <TextBox x:Name="Chat"
                        Margin="5"
                        Text="Chat Box"
-                       FontSize="28"
+                       FontSize="20"
                        VerticalAlignment="Center"
-                       HorizontalAlignment="Left"
-                       Foreground="White"
-                       Grid.Row="1"/>
+                       HorizontalAlignment="Stretch"
+                       Background="Transparent"
+                       Foreground="White"/>
+                </Border>
+                
+                
             </Grid>
         </Grid>
     </Grid>
