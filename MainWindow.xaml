@@ -7,9 +7,9 @@
         mc:Ignorable="d"
         ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="725" Width="1200">
     <Grid x:Name="BaseGrid"
-          Background="#212121">
+          Background="{StaticResource BackgroundColor}">
         <!--<Border Background="Transparent"
                 CornerRadius="40">
             <Border.Effect>
@@ -30,32 +30,89 @@
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="40"/>
+                <RowDefinition Height="50"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
-            <TextBlock x:Name="Search_Box"
-                       Text="Search"
-                       FontSize="28"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Left"
-                       Foreground="White"
-                       Grid.Column="0"/>
-            
-            <TextBlock x:Name="Message_Name"
+            <Grid Name="Search_Start"
+                  ShowGridLines="True"
+                  Grid.Column="0"
+                  Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="4.2*"/>
+                    <ColumnDefinition Width="1.2*"/>
+                </Grid.ColumnDefinitions>
+                
+                <Border Background="{StaticResource TextBoxBackground}"
+                        CornerRadius="20"
+                        Grid.Column="0"
+                        Margin="5">
+                    <TextBox x:Name="Search_Box"
+                             Text="Search"
+                             FontSize="20"
+                             VerticalAlignment="Stretch"
+                             HorizontalAlignment="Stretch"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Left"
+                             BorderThickness="0"
+                             Padding="15, 0, 0, 0"
+                             Foreground="{StaticResource TextBoxForeground}"
+                             Background="Transparent"/>
+                </Border>
+
+                <Border Background="{StaticResource ButtonBackground}"
+                        CornerRadius="20"
+                        Grid.Column="1"
+                        Margin="5">
+                    <Button x:Name="Start_Chat"
+                            Content="Start Chat"
+                            FontSize="14"
+                            BorderThickness="0"
+                            Foreground="{StaticResource ButtonForeground}"
+                            Background="Transparent"/>
+                </Border>
+            </Grid>
+
+            <Grid Name="Name_Server"
+                  Grid.Column="1"
+                  Grid.Row="0"
+                  ShowGridLines="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock x:Name="Message_Name"
                        Text="Message Name"
                        FontSize="28"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Left"
-                       Foreground="White"
-                       Grid.Column="1"/>
+                       Foreground="{StaticResource ForegroundColor}"
+                       Margin="5"
+                       Grid.Column="0"/>
+
+                <Border Background="{StaticResource ButtonBackground}"
+                        CornerRadius="20"
+                        Grid.Column="1"
+                        Margin="5">
+                    <Button x:Name="Server_Toggle"
+                            Content="Start Server"
+                            FontSize="14"
+                            BorderThickness="0"
+                            Foreground="{StaticResource ButtonForeground}"
+                            Background="Transparent"/>
+                </Border>
+            </Grid>
+
+
+            
 
             <ListView x:Name="Chat_List"
                       Grid.Row="1"
                       Grid.Column="0"
                       Background="Transparent"
                       HorizontalContentAlignment="Stretch">
-                <!--<Grid HorizontalAlignment="Stretch" ShowGridLines="True">
+                <!-- <Grid HorizontalAlignment="Stretch" ShowGridLines="True">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1.2*"/>
                         <ColumnDefinition Width="3*"/>
@@ -63,7 +120,8 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="Pic" Foreground="White"/>
                     <TextBlock Grid.Column ="1" Text="Message" Foreground="White"/>
-                    <TextBlock Grid.Column ="2" Text="Time" Foreground="White"/>
+                    <TextBlock Grid.Column ="2" Text="Time" 
+                ="White"/>
                 </Grid> -->
             </ListView>
 
@@ -91,21 +149,56 @@
                     </Border> -->
                 </ListView>
 
-                <Border Background="DarkSlateGray"
-                        Grid.Row="1"
-                        CornerRadius="10"
-                        Margin="5">
-                    <TextBox x:Name="Chat"
-                       Margin="5"
-                       Text="Chat Box"
-                       FontSize="20"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Stretch"
-                       Background="Transparent"
-                       Foreground="White"/>
-                </Border>
-                
-                
+                <Grid Name="Attach_Chat_Send"
+                      Grid.Row="1"
+                      ShowGridLines="True">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="6*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Background="{StaticResource ButtonBackground}"
+                            CornerRadius="20"
+                            Grid.Column="0"
+                            Margin="5">
+                        <Button x:Name="Attachment_Button"
+                                Content="Attach"
+                                FontSize="14"
+                                BorderThickness="0"
+                                Foreground="{StaticResource ButtonForeground}"
+                                Background="Transparent"/>
+                    </Border>
+
+                    <Border Background="{StaticResource TextBoxBackground}"
+                            CornerRadius="20"
+                            Margin="5"
+                            Grid.Column="1">
+                        <TextBox x:Name="Chat"
+                                 Text="Chat Box"
+                                 FontSize="20"
+                                 VerticalAlignment="Stretch"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalContentAlignment="Center"
+                                 HorizontalContentAlignment="Left"
+                                 BorderThickness="0"
+                                 Padding="15, 0, 0, 0"
+                                 Background="Transparent"
+                                 Foreground="{StaticResource TextBoxForeground}"/>
+                    </Border>
+
+                    <Border Background="{StaticResource ButtonBackground}"
+                            CornerRadius="20"
+                            Grid.Column="2"
+                            Margin="5">
+                        <Button x:Name="Send_Button"
+                                Content="Send"
+                                FontSize="14"
+                                BorderThickness="0"
+                                Foreground="{StaticResource ButtonForeground}"
+                                Background="Transparent"/>
+                    </Border>
+                </Grid>
             </Grid>
         </Grid>
     </Grid>

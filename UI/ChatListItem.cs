@@ -13,6 +13,7 @@ using System.Windows.Controls.Primitives;
 
 
 
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Navigation;
@@ -22,7 +23,6 @@ namespace Local_Messenger
 {
     class ChatListItem : RadioButton
     {
-        static public MainWindow window;
         static private Style buttonTheme { get; }
 
         private Person person;
@@ -60,19 +60,18 @@ namespace Local_Messenger
             imageBorder.Width = 50;
             imageBorder.Clip = new RectangleGeometry(new Rect(0, 0, imageBorder.Width, imageBorder.Height), imageBorder.Width / 2, imageBorder.Height / 2);
             imageBorder.Child = facePic;
-            imageBorder.Background = Brushes.Red;
 
             // set up nameBox
             nameBox.Text = thisPerson.name;
             nameBox.FontSize = 20;
-            nameBox.Foreground = Brushes.White;
+            nameBox.Foreground = ColorScheme.ForegroundColor;
             nameBox.HorizontalAlignment = HorizontalAlignment.Left;
             nameBox.VerticalAlignment = VerticalAlignment.Center;
 
             // set up last message
             TextBlock lastMessage = new TextBlock();
             lastMessage.FontSize = 12;
-            lastMessage.Foreground = Brushes.Gray;
+            lastMessage.Foreground = ColorScheme.ForegroundDarkenedColor;
             lastMessage.HorizontalAlignment = HorizontalAlignment.Left;
             lastMessage.VerticalAlignment = VerticalAlignment.Center;
             if (thisPerson.messages.Count != 0)
@@ -130,7 +129,7 @@ namespace Local_Messenger
                 timeBox.Text = "";
             }
             timeBox.FontSize = 12;
-            timeBox.Foreground = Brushes.Gray;
+            timeBox.Foreground = ColorScheme.ForegroundDarkenedColor;
             timeBox.HorizontalAlignment = HorizontalAlignment.Right;
             timeBox.VerticalAlignment = VerticalAlignment.Top;
 
@@ -170,7 +169,7 @@ namespace Local_Messenger
 
 
             // set up this button
-            this.Foreground = Brushes.White;
+            this.Foreground = ColorScheme.ForegroundColor;
             this.HorizontalAlignment = HorizontalAlignment.Stretch;
             this.VerticalAlignment = VerticalAlignment.Center;
             this.Content = grid;
@@ -190,6 +189,9 @@ namespace Local_Messenger
             {
                 return;
             }
+
+            MainWindow window = (MainWindow)Application.Current.MainWindow;
+            Person me = window.me;
             TextBlock Message_Name = window.Message_Name;
             ListView Message_List = window.Messages_List;
             ChatListItem thisItem = sender as ChatListItem;
