@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -26,7 +28,6 @@ namespace Local_Messenger
         {
             InitializeComponent();
             me = new Person("Me", "localhost");
-            ChatListItem.window = this;
             chats = readSavedMessages();
 
             foreach (Person person in chats)
@@ -34,11 +35,50 @@ namespace Local_Messenger
                 Chat_List.Items.Add(new ChatListItem(person));
             }
 
-            foreach (Person person in chats)
+            Task.Run(() => startServer());
+        }
+
+        public async Task startServer()
+        {
+            await Task.Run(() =>
             {
-                MessageListItem.AddToListView(Messages_List, person.messages.ToArray(), me);
-                break;
-            }
+                TcpListener server = new TcpListener(IPAddress.Any, 18604);
+                // we set our IP address as server's address, and we also set the port: 18604
+
+                server.Start();  // this will start the server
+
+                while (true)   //we wait for a connection
+                {
+                    TcpClient client = server.AcceptTcpClient();  //if a connection exists, the server will accept it
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        Chat.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
+                    });
+
+                    NetworkStream ns = client.GetStream(); //networkstream is used to send/receive messages
+
+                    byte[] hello = new byte[100];   //any message must be serialized (converted to byte array)
+                    hello = Encoding.Default.GetBytes("hello world");  //conversion string => byte array
+
+                    ns.Write(hello, 0, hello.Length);     //sending the message
+
+                    while (client.Connected)  //while the client is connected, we look for incoming messages
+                    {
+                        byte[] msg = new byte[1024];     //the messages arrive as byte array
+                        ns.Read(msg, 0, msg.Length);   //the same networkstream reads the message sent by the client
+
+                        this.Dispatcher.Invoke(() => { Chat.Text = Encoding.Default.GetString(msg); });
+                        Console.WriteLine(Encoding.Default.GetString(msg)); //now , we write the message as string
+                    }
+                }
+            });
+        }
+
+        public void connectServer(string hostname)
+        {
+            string server = "127.0.0.1";
+            TcpClient client = new TcpClient(server, 18604);
+            client.Close();
         }
 
         List<Person> readSavedMessages()
@@ -61,6 +101,8 @@ namespace Local_Messenger
             temp2.addMessage(new Message(me, temp2, "top me", DateTime.Parse("11/10/2022 3:34:52 PM")));
             temp2.addMessage(new Message(me, temp2, "middle me", DateTime.Parse("11/10/2022 3:35:52 PM")));
             temp2.addMessage(new Message(me, temp2, "bottom me", DateTime.Parse("11/14/2022 8:36:52 PM")));
+            temp2.addMessage(new Message(me, temp2, "new bottom me", DateTime.Parse("11/14/2022 10:36:52 PM")));
+
 
             Person temp3 = new Person("loseph", "Bing");
             temp3.addMessage(me, temp3, "jaeni");

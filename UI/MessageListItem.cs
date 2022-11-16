@@ -45,15 +45,15 @@ namespace Local_Messenger
                 if (index <= (int) Themes.SenderSolo)
                 {
                     border.SetValue(Border.HorizontalAlignmentProperty, HorizontalAlignment.Right);
-                    border.SetValue(Border.BackgroundProperty, Brushes.Violet);
-                    text.SetValue(TextBlock.ForegroundProperty, Brushes.Black);
+                    border.SetValue(Border.BackgroundProperty, ColorScheme.SentBackground);
+                    text.SetValue(TextBlock.ForegroundProperty, ColorScheme.SentForeground);
 
                 }
                 else // if receiver
                 {
                     border.SetValue(Border.HorizontalAlignmentProperty, HorizontalAlignment.Left);
-                    border.SetValue(Border.BackgroundProperty, Brushes.DarkSlateGray);
-                    text.SetValue(TextBlock.ForegroundProperty, Brushes.White);
+                    border.SetValue(Border.BackgroundProperty, ColorScheme.ReceivedBackground);
+                    text.SetValue(TextBlock.ForegroundProperty, ColorScheme.ReceivedForeground);
                 }
 
                 switch (index)

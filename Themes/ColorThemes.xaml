@@ -1,0 +1,19 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <SolidColorBrush x:Key="BackgroundColor" Color="#FF212121"/>
+    <SolidColorBrush x:Key="ForegroundColor" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="ForegroundDarkenedColor" Color="Gray"/>
+
+    <SolidColorBrush x:Key="ButtonBackground" Color="#FF4C6085"/>
+    <SolidColorBrush x:Key="ButtonForeground" Color="#FFFFFFFF"/>
+    
+    <SolidColorBrush x:Key="TextBoxBackground" Color="#FF2F4F4F"/>
+    <SolidColorBrush x:Key="TextBoxForeground" Color="#FFAAAAAA"/>
+    
+    
+    <SolidColorBrush x:Key="SentBackground" Color="#FF23CE6B"/>
+    <SolidColorBrush x:Key="SentForeground" Color="#FF2F4F4F"/>
+    
+    <SolidColorBrush x:Key="ReceivedBackground" Color="#FF2F4F4F"/>
+    <SolidColorBrush x:Key="ReceivedForeground" Color="#FFFFFFFF"/>
+</ResourceDictionary>
