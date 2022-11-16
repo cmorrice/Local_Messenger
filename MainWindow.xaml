@@ -78,8 +78,8 @@
                   Grid.Row="0"
                   ShowGridLines="True">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="5*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 
                 <TextBlock x:Name="Message_Name"
@@ -93,8 +93,10 @@
 
                 <Border Background="{StaticResource ButtonBackground}"
                         CornerRadius="20"
+                        HorizontalAlignment="Right"
                         Grid.Column="1"
-                        Margin="5">
+                        Margin="5"
+                        Padding="15, 0, 15, 0">
                     <Button x:Name="Server_Toggle"
                             Content="Start Server"
                             FontSize="14"

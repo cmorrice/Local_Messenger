@@ -60,6 +60,7 @@ namespace Local_Messenger
             imageBorder.Width = 50;
             imageBorder.Clip = new RectangleGeometry(new Rect(0, 0, imageBorder.Width, imageBorder.Height), imageBorder.Width / 2, imageBorder.Height / 2);
             imageBorder.Child = facePic;
+            imageBorder.Margin = new Thickness(5);
 
             // set up nameBox
             nameBox.Text = thisPerson.name;
@@ -179,7 +180,7 @@ namespace Local_Messenger
             this.Click += new RoutedEventHandler(OnChatClicked);
 
             // styles the button as a toggle button
-            this.Margin = new Thickness(5);
+            this.Padding = new Thickness(5);
             this.Style = buttonTheme;
         }
 
