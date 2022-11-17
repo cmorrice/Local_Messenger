@@ -8,7 +8,7 @@ using System.Windows.Media.Imaging;
 
 namespace Local_Messenger
 {
-    public class Person : INotifyPropertyChanged
+    public class Person : INotifyPropertyChanged, IComparable<Person>
     {
         private string _name;
         public string name
@@ -77,6 +77,23 @@ namespace Local_Messenger
         }
 
 
+
+        // Default comparer for Person type.
+        public int CompareTo(Person comparePerson)
+        {
+            if (comparePerson == null || comparePerson.messages.Count == 0)
+            {
+                return 1;
+            }
+            else if (this.messages.Count == 0)
+            {
+                return -1;
+            }
+            else
+            {
+                return comparePerson.messages[^1].sentTimeStamp.CompareTo(this.messages[^1].sentTimeStamp);
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

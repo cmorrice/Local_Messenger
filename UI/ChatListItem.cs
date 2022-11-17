@@ -106,7 +106,11 @@ namespace Local_Messenger
             {
                 DateTime timeStamp = thisPerson.messages.Last().sentTimeStamp;
                 TimeSpan difference = DateTime.Now - timeStamp;
-                if (difference.TotalHours < 1) // show in minutes
+                if (difference.TotalMinutes < 1) // show now
+                {
+                    timeBox.Text = "Now";
+                }
+                else if (difference.TotalHours < 1) // show in minutes
                 {
                     timeBox.Text = string.Format("{0} min", (int) difference.TotalMinutes);
                 }
@@ -114,7 +118,7 @@ namespace Local_Messenger
                 {
                     timeBox.Text = timeStamp.ToString("h:mm tt");
                 }
-                else if (difference.TotalDays < 7) // show the day in words
+                else if (difference.TotalDays < 6) // show the day in words
                 {
                     timeBox.Text = timeStamp.ToString("ddd");
                 }
@@ -191,30 +195,28 @@ namespace Local_Messenger
             if (sender == null)
             {
                 return;
-            }           
-
+            }
 
             MainWindow window = (MainWindow)Application.Current.MainWindow;
             Person me = window.me;
             TextBlock Message_Name = window.Message_Name;
             ListView Message_List = window.Messages_List;
+            TextBox Chat_Box = window.Chat_Box;
             ChatListItem thisItem = sender as ChatListItem;
 
-            TextBox Chat = window.Chat;
-            if (messageTarget != null)
-            {
-                messageTarget.draft = Chat.Text;
-            }
-
-            // change the messages shown
-
+            // change the name and messages shown
             Message_Name.Text = person.name;
             Message_List.Items.Clear();
-            messageTarget = person;
-            Chat.Text = messageTarget.draft;
-
             MessageListItem.AddToListView(Message_List, person.messages.ToArray(), window.me);
-            
+
+            // add in draft message to chat_box if it exists
+            if (messageTarget != null)
+            {
+                messageTarget.draft = Chat_Box.Text;
+            }
+
+            messageTarget = person;
+            Chat_Box.Text = messageTarget.draft;
         }
         //public BitmapImage Convert(System.Drawing.Image img)
         //{
