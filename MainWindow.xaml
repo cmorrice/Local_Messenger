@@ -126,6 +126,8 @@
                     <TextBlock Grid.Column ="2" Text="Time" 
                 ="White"/>
                 </Grid> -->
+                <TextBlock x:Name="Server_Out" Text="Server Output" Background="CornflowerBlue"/>
+                <TextBlock x:Name="Client_Out" Text="Client Output" Background="PaleVioletRed"/>
             </ListView>
 
             <Grid x:Name="Messages_Area"
