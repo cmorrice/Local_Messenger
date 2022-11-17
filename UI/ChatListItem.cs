@@ -27,6 +27,8 @@ namespace Local_Messenger
 
         private Person person;
 
+        public static Person messageTarget = null; //the person you are sending a message to
+
         static ChatListItem()
         {
             // creates the toggle button style
@@ -189,17 +191,27 @@ namespace Local_Messenger
             if (sender == null)
             {
                 return;
-            }
+            }           
+
 
             MainWindow window = (MainWindow)Application.Current.MainWindow;
             Person me = window.me;
             TextBlock Message_Name = window.Message_Name;
             ListView Message_List = window.Messages_List;
             ChatListItem thisItem = sender as ChatListItem;
+
+            TextBox Chat = window.Chat;
+            if (messageTarget != null)
+            {
+                messageTarget.draft = Chat.Text;
+            }
+
             // change the messages shown
 
             Message_Name.Text = person.name;
             Message_List.Items.Clear();
+            messageTarget = person;
+            Chat.Text = messageTarget.draft;
 
             MessageListItem.AddToListView(Message_List, person.messages.ToArray(), window.me);
             

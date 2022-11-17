@@ -198,7 +198,7 @@
                                 FontSize="14"
                                 BorderThickness="0"
                                 Foreground="{StaticResource ButtonForeground}"
-                                Background="Transparent"/>
+                                Background="Transparent" Click="Send_Button_Click"/>
                     </Border>
                 </Grid>
             </Grid>

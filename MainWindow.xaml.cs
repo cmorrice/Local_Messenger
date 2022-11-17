@@ -122,6 +122,26 @@ namespace Local_Messenger
             return messages;
         }
 
-        
+        private void Send_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (ChatListItem.messageTarget != null)
+            {
+                MainWindow window = (MainWindow)Application.Current.MainWindow;
+                ListView Message_List = window.Messages_List;
+
+                ChatListItem.messageTarget.sendMessage(me, Chat.Text);
+                Chat.Text = string.Empty;
+              
+                Message_List.Items.Clear();
+
+                MessageListItem.AddToListView(Message_List, ChatListItem.messageTarget.messages.ToArray(), window.me);
+
+                /*ChatListItem.messageTarget.addMessage(new Message(ChatListItem.messageTarget,
+                                                                  me,
+                                                                  Chat.Text,
+                                                                  DateTime.Now));
+                */
+            }
+        }
     }
 }
