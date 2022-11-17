@@ -36,42 +36,58 @@ namespace Local_Messenger
             }
 
             Task.Run(() => startServer());
+            Task.Run(() => startClient());
         }
 
         public async Task startServer()
         {
-            await Task.Run(() =>
+            TcpListener server = new TcpListener(IPAddress.Any, 18604);
+            // we set our IP address as server's address, and we also set the port: 18604
+
+            server.Start();  // this will start the server
+
+            while (true)   //we wait for a connection
             {
-                TcpListener server = new TcpListener(IPAddress.Any, 18604);
-                // we set our IP address as server's address, and we also set the port: 18604
-
-                server.Start();  // this will start the server
-
-                while (true)   //we wait for a connection
+                TcpClient client = server.AcceptTcpClient();  //if a connection exists, the server will accept it
+                this.Dispatcher.Invoke(() =>
                 {
-                    TcpClient client = server.AcceptTcpClient();  //if a connection exists, the server will accept it
-                    this.Dispatcher.Invoke(() =>
-                    {
-                        Chat.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
-                    });
+                    Server_Out.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
+                });
 
-                    NetworkStream ns = client.GetStream(); //networkstream is used to send/receive messages
+                NetworkStream ns = client.GetStream(); //networkstream is used to send/receive messages
 
-                    byte[] hello = new byte[100];   //any message must be serialized (converted to byte array)
-                    hello = Encoding.Default.GetBytes("hello world");  //conversion string => byte array
+                byte[] hello = new byte[100];   //any message must be serialized (converted to byte array)
+                hello = Encoding.Default.GetBytes("hello world");  //conversion string => byte array
 
-                    ns.Write(hello, 0, hello.Length);     //sending the message
+                ns.Write(hello, 0, hello.Length);     //sending the message
 
-                    while (client.Connected)  //while the client is connected, we look for incoming messages
-                    {
-                        byte[] msg = new byte[1024];     //the messages arrive as byte array
-                        ns.Read(msg, 0, msg.Length);   //the same networkstream reads the message sent by the client
+                while (client.Connected)  //while the client is connected, we look for incoming messages
+                {
+                    byte[] msg = new byte[1024];     //the messages arrive as byte array
+                    ns.Read(msg, 0, msg.Length);   //the same networkstream reads the message sent by the client
 
-                        this.Dispatcher.Invoke(() => { Chat.Text = Encoding.Default.GetString(msg); });
-                        Console.WriteLine(Encoding.Default.GetString(msg)); //now , we write the message as string
-                    }
+                    this.Dispatcher.Invoke(() => { Server_Out.Text = Encoding.Default.GetString(msg); });
+                    Console.WriteLine(Encoding.Default.GetString(msg)); //now , we write the message as string
                 }
-            });
+            }
+        }
+
+        public async Task startClient()
+        {
+            await Task.Delay(1000);
+            TcpClient client = new TcpClient("127.0.0.1", 18604);
+            NetworkStream stream = client.GetStream();
+            byte[] hello = Encoding.Default.GetBytes("freaky friday");
+
+            stream.Write(hello, 0, hello.Length);
+
+            while (client.Connected)
+            {
+                byte[] msg = new byte[1024];
+                stream.Read(msg, 0, msg.Length);
+
+                this.Dispatcher.Invoke(() => { Client_Out.Text = Encoding.Default.GetString(msg); });
+            }
         }
 
         public void connectServer(string hostname)
