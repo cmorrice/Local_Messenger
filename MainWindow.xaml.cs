@@ -22,20 +22,25 @@ namespace Local_Messenger
     /// </summary>
     public partial class MainWindow : Window
     {
-        public Person me;
-        List<Person> chats;
+        public Person me = new Person("Me", "localhost");
+        List<Person> chats = new List<Person>();
         public MainWindow()
         {
             InitializeComponent();
-            me = new Person("Me", "localhost");
-            chats = readSavedMessages();
+            readSavedMessages();
+            addChats();
 
+            Task.Run(() => startServer());
+        }
+
+        public void addChats()
+        {
+            Chat_List.Items.Clear();
+            chats.Sort();
             foreach (Person person in chats)
             {
                 Chat_List.Items.Add(new ChatListItem(person));
             }
-
-            Task.Run(() => startServer());
         }
 
         public async Task startServer()
@@ -52,7 +57,7 @@ namespace Local_Messenger
                     TcpClient client = server.AcceptTcpClient();  //if a connection exists, the server will accept it
                     this.Dispatcher.Invoke(() =>
                     {
-                        Chat.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
+                        Chat_Box.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
                     });
 
                     NetworkStream ns = client.GetStream(); //networkstream is used to send/receive messages
@@ -67,7 +72,7 @@ namespace Local_Messenger
                         byte[] msg = new byte[1024];     //the messages arrive as byte array
                         ns.Read(msg, 0, msg.Length);   //the same networkstream reads the message sent by the client
 
-                        this.Dispatcher.Invoke(() => { Chat.Text = Encoding.Default.GetString(msg); });
+                        this.Dispatcher.Invoke(() => { Chat_Box.Text = Encoding.Default.GetString(msg); });
                         Console.WriteLine(Encoding.Default.GetString(msg)); //now , we write the message as string
                     }
                 }
@@ -81,9 +86,8 @@ namespace Local_Messenger
             client.Close();
         }
 
-        List<Person> readSavedMessages()
+        private void readSavedMessages()
         {
-            List<Person> messages = new List<Person>();
             Person temp1 = new Person("melo", "Spectre");
             temp1.addMessage(me, temp1, "HELLO MELO");
             temp1.sendMessage(me, "I (me) SENT THIS!");
@@ -103,7 +107,6 @@ namespace Local_Messenger
             temp2.addMessage(new Message(me, temp2, "bottom me", DateTime.Parse("11/14/2022 8:36:52 PM")));
             temp2.addMessage(new Message(me, temp2, "new bottom me", DateTime.Parse("11/14/2022 10:36:52 PM")));
 
-
             Person temp3 = new Person("loseph", "Bing");
             temp3.addMessage(me, temp3, "jaeni");
             temp3.addMessage(new Message(me, temp3, "lebi i josef", DateTime.Parse("10/7/2022 10:29:52 PM")));
@@ -112,16 +115,31 @@ namespace Local_Messenger
             temp4.addMessage(me, temp4, "ye");
             temp4.addMessage(new Message(me, temp4, "schlumped", DateTime.Parse("9/7/2021 10:29:52 PM")));
 
-            messages.Add(temp1);
-            messages.Add(temp2);
-            messages.Add(temp3);
-            messages.Add(temp4);
+            chats.Add(temp1);
+            chats.Add(temp2);
+            chats.Add(temp3);
+            chats.Add(temp4);
 
             //messages.Sort();
-
-            return messages;
         }
 
-        
+        private void Send_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (ChatListItem.messageTarget == null)
+            {
+                return;
+            }
+
+            // send the message and clear the chat_box
+            ChatListItem.messageTarget.sendMessage(me, Chat_Box.Text);
+            Chat_Box.Text = string.Empty;
+
+            // refresh the messages
+            Messages_List.Items.Clear();
+            MessageListItem.AddToListView(Messages_List, ChatListItem.messageTarget.messages.ToArray(), me);
+
+            // refresh the chat list
+            addChats();
+        }
     }
 }

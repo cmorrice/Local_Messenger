@@ -176,7 +176,7 @@
                             CornerRadius="20"
                             Margin="5"
                             Grid.Column="1">
-                        <TextBox x:Name="Chat"
+                        <TextBox x:Name="Chat_Box"
                                  Text="Chat Box"
                                  FontSize="20"
                                  VerticalAlignment="Stretch"
@@ -198,7 +198,8 @@
                                 FontSize="14"
                                 BorderThickness="0"
                                 Foreground="{StaticResource ButtonForeground}"
-                                Background="Transparent"/>
+                                Background="Transparent"
+                                Click="Send_Button_Click"/>
                     </Border>
                 </Grid>
             </Grid>
