@@ -80,7 +80,20 @@ namespace Local_Messenger
             if (thisPerson.messages.Count != 0)
             {
                 Message last = thisPerson.messages.Last();
-                string preview = string.Format("{0}: {1}", last.sender.name, last.content);
+                string preview = string.Empty;
+                switch ((int) last.type)
+                {
+                    case (int)Message.MessageType.text:
+                        preview = string.Format("{0}: {1}", last.sender.name, (string) last.content);
+                        break;
+                    case (int)Message.MessageType.image:
+                        preview = string.Format("{0}: <image>", last.sender.name);
+                        break;
+                    case (int)Message.MessageType.file:
+                        preview = string.Format("{0}: <file>", last.sender.name);
+                        break;
+                }
+
                 if (preview.Length >= 25)
                 {
                     preview = preview.Substring(0, 25) + "...";

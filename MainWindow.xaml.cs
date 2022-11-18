@@ -143,6 +143,7 @@ namespace Local_Messenger
             temp2.addMessage(new Message(me, temp2, "bottom me", DateTime.Parse("11/14/2022 8:36:52 PM")));
             temp2.addMessage(new Message(me, temp2, "new bottom me", DateTime.Parse("11/14/2022 10:36:52 PM")));
             temp2.addMessage(temp2, me, "hello :)");
+            temp2.addMessage(new Message(temp2, me, new BitmapImage(new Uri("pack://application:,,,/Local Messenger;component/Media/Images/cat.jpg")), DateTime.Now));
 
             Person temp3 = new Person("loseph", "Bing");
             temp3.addMessage(new Message(me, temp3, "jaeni", DateTime.Parse("10/6/2022 10:29:52 PM")));

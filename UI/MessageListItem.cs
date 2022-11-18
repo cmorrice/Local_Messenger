@@ -21,7 +21,13 @@ namespace Local_Messenger
         public enum Themes
         {
             SenderTop, SenderMiddle, SenderBottom, SenderSolo,
-            ReceiverTop, ReceiverMiddle, ReceiverBottom, ReceiverSolo
+            ReceiverTop, ReceiverMiddle, ReceiverBottom, ReceiverSolo,
+
+            SenderImage,
+            ReceiverImage,
+            
+            SenderFile,
+            ReceiverFile
         }
 
         static private Style[] themes = new Style[Enum.GetNames(typeof(Themes)).Length];
@@ -33,8 +39,8 @@ namespace Local_Messenger
 
         static MessageListItem()
         {
-            // create each of the styles
-            for (int index = 0; index < themes.Length; index++)
+            // create each of the normal message styles
+            for (int index = 0; index <= (int) Themes.ReceiverSolo; index++)
             {
                 themes[index] = new Style(typeof(Button));
                 ControlTemplate template = new ControlTemplate(typeof(Button));
@@ -98,6 +104,53 @@ namespace Local_Messenger
                 themes[index].Setters.Add(new Setter { Property = Button.TemplateProperty, Value = template });
             }
 
+            // create the image styles
+            for (int index = (int) Themes.SenderImage; index <= (int) Themes.ReceiverImage; index++)
+            {
+                themes[index] = new Style(typeof(Button));
+                ControlTemplate template = new ControlTemplate(typeof(Button));
+
+                FrameworkElementFactory border = new FrameworkElementFactory(typeof(Border));
+                border.SetValue(Border.HeightProperty, 80.0);
+                border.SetValue(Border.WidthProperty, 80.0);
+                border.SetValue(Border.MarginProperty, new Thickness(5));
+
+                template.VisualTree = border;
+
+
+                FrameworkElementFactory image = new FrameworkElementFactory(typeof(Image));
+                
+                image.SetBinding(Image.SourceProperty, new Binding { RelativeSource = RelativeSource.TemplatedParent, Path = new PropertyPath("Content") });
+                image.SetValue(Image.WidthProperty, 80.0);
+                image.SetValue(Image.HeightProperty, 80.0);
+                image.SetValue(Image.StretchProperty, Stretch.UniformToFill);
+
+                //FrameworkElementFactory imageBrush = new FrameworkElementFactory(typeof(ImageBrush));
+                //imageBrush.SetValue(ImageBrush.ImageSourceProperty, image);
+                //imageBrush.SetValue(ImageBrush.StretchProperty, Stretch.UniformToFill);
+
+                border.SetValue(Border.ClipProperty, new RectangleGeometry(new Rect(0, 0, 80.0, 80.0), 80.0 / 2, 80.0 / 2));
+
+                border.AppendChild(image);
+
+                // if sender
+                if (index == (int)Themes.SenderImage)
+                {
+                    border.SetValue(Border.HorizontalAlignmentProperty, HorizontalAlignment.Right);
+                    border.SetValue(Border.BackgroundProperty, ColorScheme.SentBackground);
+
+                }
+                else if (index == (int) Themes.ReceiverImage)
+                {
+                    border.SetValue(Border.HorizontalAlignmentProperty, HorizontalAlignment.Left);
+                    border.SetValue(Border.BackgroundProperty, ColorScheme.ReceivedBackground);
+                }
+
+                themes[index].Setters.Add(new Setter { Property = Button.TemplateProperty, Value = template });
+            }
+
+
+
             // create the ContextMenu style
             ControlTemplate contextTemplate = new ControlTemplate(typeof(ContextMenu));
             FrameworkElementFactory contextBorder = new FrameworkElementFactory(typeof(Border));
@@ -119,7 +172,7 @@ namespace Local_Messenger
 
             FrameworkElementFactory menuText = new FrameworkElementFactory(typeof(TextBlock));
             menuBorder.AppendChild(menuText);
-            menuText.SetValue(TextBlock.TextProperty, "Delete");
+            menuText.SetBinding(TextBlock.TextProperty, new Binding { RelativeSource = RelativeSource.TemplatedParent, Path = new PropertyPath("Tag") });
             menuText.SetValue(TextBlock.FontSizeProperty, 14.0);
             menuText.SetValue(TextBlock.ForegroundProperty, ColorScheme.ButtonForeground);
             menuText.SetValue(TextBlock.VerticalAlignmentProperty, VerticalAlignment.Center);
@@ -129,24 +182,30 @@ namespace Local_Messenger
             //Trigger styleTrigger = new Trigger { Property = MenuItem.IsMouseOverProperty, Value = true };
             //styleTrigger.Setters.Add(new Setter { Property = MenuItem.BackgroundProperty, Value = new SolidColorBrush(Color.FromRgb(62, 113, 124))});
             //contextTemplate.Triggers.Add(styleTrigger);
-
-            //MenuItem deleteItem = new MenuItem();
-            //deleteItem.Style = menuStyle;
-            //deleteItem.Click += new RoutedEventHandler(MenuItemClicked);
-            //messageMenu.Items.Add(deleteItem);
         }
 
         private MessageListItem(Message thisMessage)
         {
             // set up the message itself
-            message = thisMessage;
+            this.message = thisMessage;
             this.SetBinding(Button.ContentProperty, new Binding { Source = thisMessage, Path = new PropertyPath("content") });
 
             // set up the context menu
             ContextMenu menu = new ContextMenu();
             menu.Style = ContextMenuTheme;
 
+            // if image or file, give the option to save
+            if (thisMessage.type == Message.MessageType.image || thisMessage.type == Message.MessageType.file)
+            {
+                MenuItem save = new MenuItem();
+                save.Tag = "Save";
+                save.Style = MenuItemTheme;
+                save.Click += new RoutedEventHandler(SaveItemClicked);
+                menu.Items.Add(save);
+            }
+
             MenuItem delete = new MenuItem();
+            delete.Tag = "Delete";
             delete.Style = MenuItemTheme;
             delete.Click += new RoutedEventHandler(DeleteItemClicked);
 
@@ -170,6 +229,21 @@ namespace Local_Messenger
         public MessageListItem(Message thisMessage, Themes style) : this(thisMessage)
         {
             this.Style = themes[(int)style];
+        }
+
+        private void SaveItemClicked(object sender, RoutedEventArgs e)
+        {
+            if (sender == null)
+            {
+                return;
+            }
+
+            BitmapImage image = this.message.content as BitmapImage;
+            BitmapEncoder encoder = new JpegBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(image));
+
+            FileStream file = new FileStream(string.Format("{0}\\{1}", AppDomain.CurrentDomain.BaseDirectory, "Image.jpg"), System.IO.FileMode.Create);
+            encoder.Save(file);
         }
 
         private void DeleteItemClicked(object sender, RoutedEventArgs e)
@@ -283,6 +357,21 @@ namespace Local_Messenger
             {
                 Message last = messages[messages.Length - 2];
                 Message message = messages[messages.Length - 1];
+
+                // REALLY JANKY JUST FOR TESTING
+                if (message.type == Message.MessageType.image)
+                {
+                    if (message.sender == sender)
+                    {
+                        list.Items.Add(new MessageListItem(message, Themes.SenderImage));
+                    }
+                    else
+                    {
+                        list.Items.Add(new MessageListItem(message, Themes.ReceiverImage));
+                    }
+                    return;
+                }
+                // END OF REALLY JANKY
 
                 if (message.sender == sender) // if sent
                 {
