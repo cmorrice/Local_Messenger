@@ -78,8 +78,8 @@
                   Grid.Row="0"
                   ShowGridLines="True">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="5*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 
                 <TextBlock x:Name="Message_Name"
@@ -93,8 +93,10 @@
 
                 <Border Background="{StaticResource ButtonBackground}"
                         CornerRadius="20"
+                        HorizontalAlignment="Right"
                         Grid.Column="1"
-                        Margin="5">
+                        Margin="5"
+                        Padding="15, 0, 15, 0">
                     <Button x:Name="Server_Toggle"
                             Content="Start Server"
                             FontSize="14"
@@ -174,7 +176,7 @@
                             CornerRadius="20"
                             Margin="5"
                             Grid.Column="1">
-                        <TextBox x:Name="Chat"
+                        <TextBox x:Name="Chat_Box"
                                  Text="Chat Box"
                                  FontSize="20"
                                  VerticalAlignment="Stretch"
@@ -196,7 +198,8 @@
                                 FontSize="14"
                                 BorderThickness="0"
                                 Foreground="{StaticResource ButtonForeground}"
-                                Background="Transparent"/>
+                                Background="Transparent"
+                                Click="Send_Button_Click"/>
                     </Border>
                 </Grid>
             </Grid>

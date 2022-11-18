@@ -15,6 +15,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.IO;
+
 namespace Local_Messenger
 {
     /// <summary>
@@ -22,20 +26,38 @@ namespace Local_Messenger
     /// </summary>
     public partial class MainWindow : Window
     {
-        public Person me;
-        List<Person> chats;
+        public Person me = new Person("Me", "localhost");
+        public List<Person> chats = new List<Person>();
         public MainWindow()
         {
             InitializeComponent();
-            me = new Person("Me", "localhost");
-            chats = readSavedMessages();
+            readSavedMessages();
+            refreshWindow();
 
+            Task.Run(() => startServer());
+        }
+
+        public void refreshWindow()
+        {
+            // refresh the chat list
+            addChats();
+
+            // refresh the messages
+            Messages_List.Items.Clear();
+            if (ChatListItem.messageTarget != null)
+            {
+                MessageListItem.AddToListView(Messages_List, ChatListItem.messageTarget.messages.ToArray(), me);
+            }
+        }
+
+        public void addChats()
+        {
+            Chat_List.Items.Clear();
+            chats.Sort();
             foreach (Person person in chats)
             {
                 Chat_List.Items.Add(new ChatListItem(person));
             }
-
-            Task.Run(() => startServer());
         }
 
         public async Task startServer()
@@ -52,7 +74,7 @@ namespace Local_Messenger
                     TcpClient client = server.AcceptTcpClient();  //if a connection exists, the server will accept it
                     this.Dispatcher.Invoke(() =>
                     {
-                        Chat.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
+                        Chat_Box.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
                     });
 
                     NetworkStream ns = client.GetStream(); //networkstream is used to send/receive messages
@@ -67,7 +89,7 @@ namespace Local_Messenger
                         byte[] msg = new byte[1024];     //the messages arrive as byte array
                         ns.Read(msg, 0, msg.Length);   //the same networkstream reads the message sent by the client
 
-                        this.Dispatcher.Invoke(() => { Chat.Text = Encoding.Default.GetString(msg); });
+                        this.Dispatcher.Invoke(() => { Chat_Box.Text = Encoding.Default.GetString(msg); });
                         Console.WriteLine(Encoding.Default.GetString(msg)); //now , we write the message as string
                     }
                 }
@@ -81,18 +103,36 @@ namespace Local_Messenger
             client.Close();
         }
 
-        List<Person> readSavedMessages()
+        private void readSavedMessages()
         {
-            List<Person> messages = new List<Person>();
+            addTestMessages();
+            //writeSavedMessages();
+        }
+
+        private void writeSavedMessages()
+        {
+            JsonSerializerOptions options = new JsonSerializerOptions();
+            options.ReferenceHandler = ReferenceHandler.Preserve;
+
+
+            object[] scary = new object[] { me, chats.ToArray() };
+            string json = JsonSerializer.Serialize(scary, options);
+
+            File.WriteAllText(string.Format("{0}\\{1}", AppDomain.CurrentDomain.BaseDirectory, "Chat.data"), json);
+
+        }
+
+        private void addTestMessages()
+        {
             Person temp1 = new Person("melo", "Spectre");
-            temp1.addMessage(me, temp1, "HELLO MELO");
-            temp1.sendMessage(me, "I (me) SENT THIS!");
-            temp1.addMessage(temp1, me, "this is melo's response");
+            temp1.addMessage(new Message(me, temp1, "HELLO MELO", DateTime.Parse("11/09/2022 11:09:52 PM")));
+            temp1.addMessage(new Message(temp1, me, "this is melo's response", DateTime.Parse("11/10/2022 6:08:52 PM")));
             temp1.addMessage(new Message(me, temp1, "this is melo's response", DateTime.Parse("11/10/2022 6:09:52 PM")));
+            temp1.sendMessage(me, "I (me) SENT THIS!");
 
             Person temp2 = new Person("ala", "Asus");
-            temp2.addMessage(me, temp2, "dobre miejsce");
-            temp2.addMessage(me, temp2, "spelled right pronounced wrong");
+            temp2.addMessage(new Message(me, temp2, "dobre miejsce", DateTime.Parse("11/10/2022 3:28:33 PM")));
+            temp2.addMessage(new Message(me, temp2, "spelled right pronounced wrong", DateTime.Parse("11/10/2022 3:28:52 PM")));
             temp2.addMessage(new Message(temp2, me, "this is ala's response", DateTime.Parse("11/10/2022 3:29:52 PM")));
             temp2.addMessage(new Message(temp2, me, "middle ala", DateTime.Parse("11/10/2022 3:30:52 PM")));
             temp2.addMessage(new Message(temp2, me, "end ala", DateTime.Parse("11/10/2022 3:31:52 PM")));
@@ -102,26 +142,36 @@ namespace Local_Messenger
             temp2.addMessage(new Message(me, temp2, "middle me", DateTime.Parse("11/10/2022 3:35:52 PM")));
             temp2.addMessage(new Message(me, temp2, "bottom me", DateTime.Parse("11/14/2022 8:36:52 PM")));
             temp2.addMessage(new Message(me, temp2, "new bottom me", DateTime.Parse("11/14/2022 10:36:52 PM")));
-
+            temp2.addMessage(temp2, me, "hello :)");
 
             Person temp3 = new Person("loseph", "Bing");
-            temp3.addMessage(me, temp3, "jaeni");
+            temp3.addMessage(new Message(me, temp3, "jaeni", DateTime.Parse("10/6/2022 10:29:52 PM")));
             temp3.addMessage(new Message(me, temp3, "lebi i josef", DateTime.Parse("10/7/2022 10:29:52 PM")));
 
             Person temp4 = new Person("k8", "HP");
-            temp4.addMessage(me, temp4, "ye");
+            temp4.addMessage(new Message(me, temp4, "ye", DateTime.Parse("8/7/2021 10:29:52 PM")));
             temp4.addMessage(new Message(me, temp4, "schlumped", DateTime.Parse("9/7/2021 10:29:52 PM")));
 
-            messages.Add(temp1);
-            messages.Add(temp2);
-            messages.Add(temp3);
-            messages.Add(temp4);
+            chats.Add(temp1);
+            chats.Add(temp2);
+            chats.Add(temp3);
+            chats.Add(temp4);
 
             //messages.Sort();
-
-            return messages;
         }
 
-        
+        private void Send_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (ChatListItem.messageTarget == null)
+            {
+                return;
+            }
+
+            // send the message and clear the chat_box
+            ChatListItem.messageTarget.sendMessage(me, Chat_Box.Text);
+            Chat_Box.Text = string.Empty;
+
+            refreshWindow();
+        }
     }
 }
