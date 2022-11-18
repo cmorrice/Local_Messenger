@@ -23,14 +23,27 @@ namespace Local_Messenger
     public partial class MainWindow : Window
     {
         public Person me = new Person("Me", "localhost");
-        List<Person> chats = new List<Person>();
+        public List<Person> chats = new List<Person>();
         public MainWindow()
         {
             InitializeComponent();
             readSavedMessages();
-            addChats();
+            refreshWindow();
 
             Task.Run(() => startServer());
+        }
+
+        public void refreshWindow()
+        {
+            // refresh the chat list
+            addChats();
+
+            // refresh the messages
+            Messages_List.Items.Clear();
+            if (ChatListItem.messageTarget != null)
+            {
+                MessageListItem.AddToListView(Messages_List, ChatListItem.messageTarget.messages.ToArray(), me);
+            }
         }
 
         public void addChats()
@@ -134,12 +147,7 @@ namespace Local_Messenger
             ChatListItem.messageTarget.sendMessage(me, Chat_Box.Text);
             Chat_Box.Text = string.Empty;
 
-            // refresh the messages
-            Messages_List.Items.Clear();
-            MessageListItem.AddToListView(Messages_List, ChatListItem.messageTarget.messages.ToArray(), me);
-
-            // refresh the chat list
-            addChats();
+            refreshWindow();
         }
     }
 }

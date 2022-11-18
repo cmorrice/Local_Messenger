@@ -21,6 +21,11 @@ namespace Local_Messenger
 
         static private Style[] themes = new Style[Enum.GetNames(typeof(Themes)).Length];
 
+        static private Style ContextMenuTheme = new Style(typeof(ContextMenu));
+        static private Style MenuItemTheme = new Style(typeof(MenuItem));
+
+        private Message message;
+
         static MessageListItem()
         {
             // create each of the styles
@@ -87,15 +92,64 @@ namespace Local_Messenger
 
                 themes[index].Setters.Add(new Setter { Property = Button.TemplateProperty, Value = template });
             }
+
+            // create the ContextMenu style
+            ControlTemplate contextTemplate = new ControlTemplate(typeof(ContextMenu));
+            FrameworkElementFactory contextBorder = new FrameworkElementFactory(typeof(Border));
+            contextTemplate.VisualTree = contextBorder;
+
+            FrameworkElementFactory contextScroll = new FrameworkElementFactory(typeof(ScrollViewer));
+            contextBorder.AppendChild(contextScroll);
+            contextScroll.SetValue(ScrollViewer.CanContentScrollProperty, true);
+            contextScroll.SetResourceReference(ScrollViewer.StyleProperty, new ComponentResourceKey(typeof(FrameworkElement), "MenuScrollViewer"));
+            contextScroll.AppendChild(new FrameworkElementFactory(typeof(ItemsPresenter)));
+            ContextMenuTheme.Setters.Add(new Setter { Property = MenuItem.TemplateProperty, Value = contextTemplate });
+
+            // create the MenuItem styles
+            ControlTemplate menuTemplate = new ControlTemplate(typeof(MenuItem));
+            FrameworkElementFactory menuBorder = new FrameworkElementFactory(typeof(Border));
+            menuBorder.SetValue(Border.BackgroundProperty, ColorScheme.ButtonBackground);
+            menuBorder.SetValue(Border.CornerRadiusProperty, new CornerRadius(5));
+            menuTemplate.VisualTree = menuBorder;
+
+            FrameworkElementFactory menuText = new FrameworkElementFactory(typeof(TextBlock));
+            menuBorder.AppendChild(menuText);
+            menuText.SetValue(TextBlock.TextProperty, "Delete");
+            menuText.SetValue(TextBlock.FontSizeProperty, 14.0);
+            menuText.SetValue(TextBlock.ForegroundProperty, ColorScheme.ButtonForeground);
+            menuText.SetValue(TextBlock.VerticalAlignmentProperty, VerticalAlignment.Center);
+            menuText.SetValue(TextBlock.HorizontalAlignmentProperty, HorizontalAlignment.Center);
+            menuText.SetValue(TextBlock.MarginProperty, new Thickness(5));
+            MenuItemTheme.Setters.Add(new Setter { Property = MenuItem.TemplateProperty, Value = menuTemplate });
+            //Trigger styleTrigger = new Trigger { Property = MenuItem.IsMouseOverProperty, Value = true };
+            //styleTrigger.Setters.Add(new Setter { Property = MenuItem.BackgroundProperty, Value = new SolidColorBrush(Color.FromRgb(62, 113, 124))});
+            //contextTemplate.Triggers.Add(styleTrigger);
+
+            //MenuItem deleteItem = new MenuItem();
+            //deleteItem.Style = menuStyle;
+            //deleteItem.Click += new RoutedEventHandler(MenuItemClicked);
+            //messageMenu.Items.Add(deleteItem);
         }
 
         private MessageListItem(Message thisMessage)
         {
+            // set up the message itself
             message = thisMessage;
             this.SetBinding(Button.ContentProperty, new Binding { Source = thisMessage, Path = new PropertyPath("content") });
+
+            // set up the context menu
+            ContextMenu menu = new ContextMenu();
+            menu.Style = ContextMenuTheme;
+
+            MenuItem delete = new MenuItem();
+            delete.Style = MenuItemTheme;
+            delete.Click += new RoutedEventHandler(DeleteItemClicked);
+
+            menu.Items.Add(delete);
+
+            this.ContextMenu = menu;
         }
 
-        Message message;
         public MessageListItem(Message thisMessage, Person user) : this(thisMessage)
         {
             if (user == thisMessage.sender)
@@ -111,6 +165,28 @@ namespace Local_Messenger
         public MessageListItem(Message thisMessage, Themes style) : this(thisMessage)
         {
             this.Style = themes[(int)style];
+        }
+
+        private void DeleteItemClicked(object sender, RoutedEventArgs e)
+        {
+            if (sender == null)
+            {
+                return;
+            }
+            MainWindow window = Application.Current.MainWindow as MainWindow;
+            Person me = window.me;
+
+            // get the other person
+            Person other = (this.message.sender == me) ? this.message.receiver : this.message.sender;
+            int index = other.messages.IndexOf(this.message);
+            if (index == -1) // if message wasn't found for some reason???
+            {
+                return;
+            }
+
+            other.messages.Remove(this.message);
+            // refresh page
+            window.refreshWindow();
         }
 
         public static void AddToListView(ListView list, Message[] messages, Person sender)
