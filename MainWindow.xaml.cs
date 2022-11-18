@@ -15,6 +15,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.IO;
+
 namespace Local_Messenger
 {
     /// <summary>
@@ -101,15 +105,34 @@ namespace Local_Messenger
 
         private void readSavedMessages()
         {
+            addTestMessages();
+            //writeSavedMessages();
+        }
+
+        private void writeSavedMessages()
+        {
+            JsonSerializerOptions options = new JsonSerializerOptions();
+            options.ReferenceHandler = ReferenceHandler.Preserve;
+
+
+            object[] scary = new object[] { me, chats.ToArray() };
+            string json = JsonSerializer.Serialize(scary, options);
+
+            File.WriteAllText(string.Format("{0}\\{1}", AppDomain.CurrentDomain.BaseDirectory, "Chat.data"), json);
+
+        }
+
+        private void addTestMessages()
+        {
             Person temp1 = new Person("melo", "Spectre");
-            temp1.addMessage(me, temp1, "HELLO MELO");
-            temp1.sendMessage(me, "I (me) SENT THIS!");
-            temp1.addMessage(temp1, me, "this is melo's response");
+            temp1.addMessage(new Message(me, temp1, "HELLO MELO", DateTime.Parse("11/09/2022 11:09:52 PM")));
+            temp1.addMessage(new Message(temp1, me, "this is melo's response", DateTime.Parse("11/10/2022 6:08:52 PM")));
             temp1.addMessage(new Message(me, temp1, "this is melo's response", DateTime.Parse("11/10/2022 6:09:52 PM")));
+            temp1.sendMessage(me, "I (me) SENT THIS!");
 
             Person temp2 = new Person("ala", "Asus");
-            temp2.addMessage(me, temp2, "dobre miejsce");
-            temp2.addMessage(me, temp2, "spelled right pronounced wrong");
+            temp2.addMessage(new Message(me, temp2, "dobre miejsce", DateTime.Parse("11/10/2022 3:28:33 PM")));
+            temp2.addMessage(new Message(me, temp2, "spelled right pronounced wrong", DateTime.Parse("11/10/2022 3:28:52 PM")));
             temp2.addMessage(new Message(temp2, me, "this is ala's response", DateTime.Parse("11/10/2022 3:29:52 PM")));
             temp2.addMessage(new Message(temp2, me, "middle ala", DateTime.Parse("11/10/2022 3:30:52 PM")));
             temp2.addMessage(new Message(temp2, me, "end ala", DateTime.Parse("11/10/2022 3:31:52 PM")));
@@ -119,13 +142,14 @@ namespace Local_Messenger
             temp2.addMessage(new Message(me, temp2, "middle me", DateTime.Parse("11/10/2022 3:35:52 PM")));
             temp2.addMessage(new Message(me, temp2, "bottom me", DateTime.Parse("11/14/2022 8:36:52 PM")));
             temp2.addMessage(new Message(me, temp2, "new bottom me", DateTime.Parse("11/14/2022 10:36:52 PM")));
+            temp2.addMessage(temp2, me, "hello :)");
 
             Person temp3 = new Person("loseph", "Bing");
-            temp3.addMessage(me, temp3, "jaeni");
+            temp3.addMessage(new Message(me, temp3, "jaeni", DateTime.Parse("10/6/2022 10:29:52 PM")));
             temp3.addMessage(new Message(me, temp3, "lebi i josef", DateTime.Parse("10/7/2022 10:29:52 PM")));
 
             Person temp4 = new Person("k8", "HP");
-            temp4.addMessage(me, temp4, "ye");
+            temp4.addMessage(new Message(me, temp4, "ye", DateTime.Parse("8/7/2021 10:29:52 PM")));
             temp4.addMessage(new Message(me, temp4, "schlumped", DateTime.Parse("9/7/2021 10:29:52 PM")));
 
             chats.Add(temp1);

@@ -9,6 +9,11 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
 
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.IO;
+using System.Windows.Media.Imaging;
+
 namespace Local_Messenger
 {
     class MessageListItem : Button
@@ -292,7 +297,7 @@ namespace Local_Messenger
                 }
                 else // if received
                 {
-                    if (message.sender != last.sender)
+                    if (message.sender == last.sender)
                     {
                         list.Items.Add(new MessageListItem(message, Themes.ReceiverBottom));
                     }
