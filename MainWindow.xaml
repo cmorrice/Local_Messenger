@@ -42,7 +42,7 @@
                     <ColumnDefinition Width="4.2*"/>
                     <ColumnDefinition Width="1.2*"/>
                 </Grid.ColumnDefinitions>
-                
+
                 <Border Background="{StaticResource TextBoxBackground}"
                         CornerRadius="20"
                         Grid.Column="0"
@@ -81,7 +81,7 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                
+
                 <TextBlock x:Name="Message_Name"
                        Text="Message Name"
                        FontSize="28"
@@ -104,10 +104,12 @@
                             Foreground="{StaticResource ButtonForeground}"
                             Background="Transparent"/>
                 </Border>
+                <Button Content="WriteFile" Click="Button_Click" Grid.ColumnSpan="2" Margin="340,6,308,5"/>
+                <Button Content="ReadFile" RenderTransformOrigin="0.505,0.592" Margin="133,6,113,5" Grid.Column="1" Click="Button_Click_1"/>
             </Grid>
 
 
-            
+
 
             <ListView x:Name="Chat_List"
                       Grid.Row="1"
