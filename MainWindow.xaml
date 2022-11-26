@@ -48,7 +48,7 @@
                         Grid.Column="0"
                         Margin="5">
                     <TextBox x:Name="Search_Box"
-                             Text="Search"
+                             Text="Search"      
                              FontSize="20"
                              VerticalAlignment="Stretch"
                              HorizontalAlignment="Stretch"
@@ -57,7 +57,8 @@
                              BorderThickness="0"
                              Padding="15, 0, 0, 0"
                              Foreground="{StaticResource TextBoxForeground}"
-                             Background="Transparent"/>
+                             Background="Transparent"
+                             KeyDown="Search_Box_KeyDown"/>
                 </Border>
 
                 <Border Background="{StaticResource ButtonBackground}"

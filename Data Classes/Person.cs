@@ -80,6 +80,23 @@ namespace Local_Messenger
             messages.Add(newMessage);
         }
 
+        // search messages for messages containing the string
+        public List<Message> searchMessages(string substr) 
+        {
+            List<Message> found = new List<Message>();
+
+            foreach (var current in messages)
+            {
+                if (current.content.Contains(substr))
+                {
+                    found.Add(current);
+                }
+            }
+
+
+            return found;
+        }
+
 
 
         // Default comparer for Person type.

@@ -173,5 +173,31 @@ namespace Local_Messenger
 
             refreshWindow();
         }
+
+        private void Search_Box_KeyDown(object sender, KeyEventArgs e)
+        {
+            List<Message> foundItems = new List<Message>();
+
+            if (e.Key == Key.Enter)
+            {
+                if (ChatListItem.messageTarget == null)
+                {
+                    Search_Box.Text = "Select a Chat";
+                    return;
+                }
+                
+                foundItems = ChatListItem.messageTarget.searchMessages(Search_Box.Text);
+                if (foundItems.Count() > 0)
+                {
+                    Messages_List.Items.Clear();
+                    MessageListItem.AddToListView(Messages_List, foundItems.ToArray(), me);
+                }
+                else
+                {
+                    Search_Box.Text = "No results found";
+                }
+            }
+        }
+
     }
 }
