@@ -74,6 +74,13 @@ namespace Local_Messenger
                 {
                     Server_Out.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
                 });
+            while (true)   //we wait for a connection
+            {
+                TcpClient client = server.AcceptTcpClient();  //if a connection exists, the server will accept it
+                this.Dispatcher.Invoke(() =>
+                {
+                    Server_Out.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
+                });
                 while (true)   //we wait for a connection
                 {
                     TcpClient client = server.AcceptTcpClient();  //if a connection exists, the server will accept it
@@ -94,6 +101,28 @@ namespace Local_Messenger
                     byte[] msg = new byte[1024];     //the messages arrive as byte array
                     ns.Read(msg, 0, msg.Length);   //the same networkstream reads the message sent by the client
 
+                    this.Dispatcher.Invoke(() => { Server_Out.Text = Encoding.Default.GetString(msg); });
+                    Console.WriteLine(Encoding.Default.GetString(msg)); //now , we write the message as string
+                }
+            }
+        }
+
+        public async Task startClient()
+        {
+            await Task.Delay(1000);
+            TcpClient client = new TcpClient("127.0.0.1", 18604);
+            NetworkStream stream = client.GetStream();
+            byte[] hello = Encoding.Default.GetBytes("freaky friday");
+
+            stream.Write(hello, 0, hello.Length);
+
+            while (client.Connected)
+            {
+                byte[] msg = new byte[1024];
+                stream.Read(msg, 0, msg.Length);
+
+                this.Dispatcher.Invoke(() => { Client_Out.Text = Encoding.Default.GetString(msg); });
+            }
                     this.Dispatcher.Invoke(() => { Server_Out.Text = Encoding.Default.GetString(msg); });
                     Console.WriteLine(Encoding.Default.GetString(msg)); //now , we write the message as string
                 }
