@@ -35,6 +35,7 @@ namespace Local_Messenger
             refreshWindow();
 
             Task.Run(() => startServer());
+            Task.Run(() => startClient());
         }
 
         public void refreshWindow()
@@ -53,6 +54,10 @@ namespace Local_Messenger
         public void addChats()
         {
             Chat_List.Items.Clear();
+
+            Chat_List.Items.Add(Server_Out);
+            Chat_List.Items.Add(Client_Out);
+
             chats.Sort();
             foreach (Person person in chats)
             {
@@ -74,20 +79,6 @@ namespace Local_Messenger
                 {
                     Server_Out.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
                 });
-            while (true)   //we wait for a connection
-            {
-                TcpClient client = server.AcceptTcpClient();  //if a connection exists, the server will accept it
-                this.Dispatcher.Invoke(() =>
-                {
-                    Server_Out.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
-                });
-                while (true)   //we wait for a connection
-                {
-                    TcpClient client = server.AcceptTcpClient();  //if a connection exists, the server will accept it
-                    this.Dispatcher.Invoke(() =>
-                    {
-                        Chat_Box.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
-                    });
 
                 NetworkStream ns = client.GetStream(); //networkstream is used to send/receive messages
 
@@ -123,33 +114,6 @@ namespace Local_Messenger
 
                 this.Dispatcher.Invoke(() => { Client_Out.Text = Encoding.Default.GetString(msg); });
             }
-                    this.Dispatcher.Invoke(() => { Server_Out.Text = Encoding.Default.GetString(msg); });
-                    Console.WriteLine(Encoding.Default.GetString(msg)); //now , we write the message as string
-                }
-            }
-        }
-
-        public async Task startClient()
-        {
-            await Task.Delay(1000);
-            TcpClient client = new TcpClient("127.0.0.1", 18604);
-            NetworkStream stream = client.GetStream();
-            byte[] hello = Encoding.Default.GetBytes("freaky friday");
-
-            stream.Write(hello, 0, hello.Length);
-
-            while (client.Connected)
-            {
-                byte[] msg = new byte[1024];
-                stream.Read(msg, 0, msg.Length);
-
-                this.Dispatcher.Invoke(() => { Client_Out.Text = Encoding.Default.GetString(msg); });
-            }
-                        this.Dispatcher.Invoke(() => { Chat_Box.Text = Encoding.Default.GetString(msg); });
-                        Console.WriteLine(Encoding.Default.GetString(msg)); //now , we write the message as string
-                    }
-                }
-            });
         }
 
         public void connectServer(string hostname)
