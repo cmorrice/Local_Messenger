@@ -297,6 +297,11 @@ namespace Local_Messenger
 
         public static void AddToListView(ListView list, Message[] messages, Person sender)
         {
+            if (messages.Length == 0)
+            {
+                return;
+            }
+
             int length = messages.Length;
             Message message = (length != 0) ? messages[0] : null;
             MessageListItem.Themes messageStyle = MessageListItem.Themes.SenderSolo;

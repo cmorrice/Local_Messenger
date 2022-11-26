@@ -87,7 +87,12 @@ namespace Local_Messenger
 
             foreach (var current in messages)
             {
-                if (current.content.Contains(substr))
+                if (current.type != Message.MessageType.text)
+                {
+                    continue;
+                }
+
+                if (((string) current.content).Contains(substr))
                 {
                     found.Add(current);
                 }
