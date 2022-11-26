@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace Local_Messenger
 {
@@ -12,8 +13,16 @@ namespace Local_Messenger
         public Person sender { get; }
         public Person receiver { get; }
 
-        private string _content;
-        public string content
+        // dictates whether this message contains text (string), image (BitMapImage), or a file (byte[])
+        public enum MessageType
+        {
+            text, image, file
+        }
+
+        public MessageType type { get; }
+
+        private object _content;
+        public object content
         {
             get => _content;
             set
@@ -33,6 +42,25 @@ namespace Local_Messenger
             this.receiver = receiver;
             this.content = content;
             this.sentTimeStamp = timestamp;
+            this.type = MessageType.text;
+        }
+
+        public Message(Person sender, Person receiver, BitmapImage content, DateTime timestamp)
+        {
+            this.sender = sender;
+            this.receiver = receiver;
+            this.content = content;
+            this.sentTimeStamp = timestamp;
+            this.type = MessageType.image;
+        }
+
+        public Message(Person sender, Person receiver, byte[] content, DateTime timestamp)
+        {
+            this.sender = sender;
+            this.receiver = receiver;
+            this.content = content;
+            this.sentTimeStamp = timestamp;
+            this.type = MessageType.file;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
