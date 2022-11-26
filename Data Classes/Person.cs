@@ -46,6 +46,8 @@ namespace Local_Messenger
             }
         }
 
+        public Uri imageUri = null;
+
         [JsonPropertyName("contactPhoto"), JsonConverter(typeof(CustomBitmapConverter))]
         public BitmapImage contactPhoto { get; }
 
@@ -53,7 +55,11 @@ namespace Local_Messenger
 
         public Person()
         {
-            contactPhoto = new BitmapImage(new Uri("pack://application:,,,/Local Messenger;component/Media/Images/cat.jpg"));
+         // if no Uri has been associated with person then use default Uri   
+         if (imageUri == null)
+               imageUri = new Uri("pack://application:,,,/Local Messenger;component/Media/Images/cat.jpg");
+
+            contactPhoto = new BitmapImage(imageUri);
             messages = new List<Message>();
         }
 
@@ -63,7 +69,17 @@ namespace Local_Messenger
             this.hostName = hostName;
         }
 
-        public void sendMessage(Person sender, string content)
+      public Person(string name, string hostName, string UriString)
+      {
+         this.name = name;
+         this.hostName = hostName;
+         this.imageUri = new Uri(UriString);
+
+         contactPhoto = new BitmapImage(imageUri);
+         messages = new List<Message>();
+      }
+
+      public void sendMessage(Person sender, string content)
         {
             addMessage(sender, this, content);
             // then actually do the sending through the server
