@@ -72,6 +72,31 @@ namespace Local_Messenger
 
             server.Start();  // this will start the server
 
+            //while (true)   //we wait for a connection
+            //{
+            //    TcpClient client = server.AcceptTcpClient();  //if a connection exists, the server will accept it
+            //    this.Dispatcher.Invoke(() =>
+            //    {
+            //        Server_Out.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
+            //    });
+
+            //    NetworkStream ns = client.GetStream(); //networkstream is used to send/receive messages
+
+            //    byte[] hello = new byte[100];   //any message must be serialized (converted to byte array)
+            //    hello = Encoding.Default.GetBytes("hello world");  //conversion string => byte array
+
+            //    ns.Write(hello, 0, hello.Length);     //sending the message
+
+            //    while (client.Connected)  //while the client is connected, we look for incoming messages
+            //    {
+            //        byte[] msg = new byte[1024];     //the messages arrive as byte array
+            //        ns.Read(msg, 0, msg.Length);   //the same networkstream reads the message sent by the client
+
+            //        this.Dispatcher.Invoke(() => { Server_Out.Text = Encoding.Default.GetString(msg); });
+            //        Console.WriteLine(Encoding.Default.GetString(msg)); //now , we write the message as string
+            //    }
+            //}
+
             while (true)   //we wait for a connection
             {
                 TcpClient client = server.AcceptTcpClient();  //if a connection exists, the server will accept it
@@ -82,18 +107,17 @@ namespace Local_Messenger
 
                 NetworkStream ns = client.GetStream(); //networkstream is used to send/receive messages
 
-                byte[] hello = new byte[100];   //any message must be serialized (converted to byte array)
-                hello = Encoding.Default.GetBytes("hello world");  //conversion string => byte array
-
-                ns.Write(hello, 0, hello.Length);     //sending the message
-
                 while (client.Connected)  //while the client is connected, we look for incoming messages
                 {
-                    byte[] msg = new byte[1024];     //the messages arrive as byte array
-                    ns.Read(msg, 0, msg.Length);   //the same networkstream reads the message sent by the client
+                    NetworkHeader received = NetworkInterface.readHeader(ns);
+                    if (received == null)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Received == null");
+                        continue;
+                    }
 
-                    this.Dispatcher.Invoke(() => { Server_Out.Text = Encoding.Default.GetString(msg); });
-                    Console.WriteLine(Encoding.Default.GetString(msg)); //now , we write the message as string
+                    this.Dispatcher.Invoke(() => { Server_Out.Text = received.fileName; });
+                    System.Diagnostics.Debug.WriteLine(string.Format("Server Received: {0} -- {1} -- {2}", received.type.ToString(), received.payloadSize, received.fileName)); //now , we write the message as string
                 }
             }
         }
@@ -103,17 +127,27 @@ namespace Local_Messenger
             await Task.Delay(1000);
             TcpClient client = new TcpClient("127.0.0.1", 18604);
             NetworkStream stream = client.GetStream();
-            byte[] hello = Encoding.Default.GetBytes("freaky friday");
 
-            stream.Write(hello, 0, hello.Length);
 
-            while (client.Connected)
-            {
-                byte[] msg = new byte[1024];
-                stream.Read(msg, 0, msg.Length);
+            //byte[] hello = Encoding.Default.GetBytes("freaky friday");
 
-                this.Dispatcher.Invoke(() => { Client_Out.Text = Encoding.Default.GetString(msg); });
-            }
+            //stream.Write(hello, 0, hello.Length);
+
+            //while (client.Connected)
+            //{
+            //    byte[] msg = new byte[1024];
+            //    stream.Read(msg, 0, msg.Length);
+
+            //    this.Dispatcher.Invoke(() => { Client_Out.Text = Encoding.Default.GetString(msg); });
+            //}
+
+            NetworkHeader send = new();
+            send.type = MessageType.connect_e;
+            send.payloadSize = 6;
+            send.fileName = "HELO SERVER Beeper";
+
+            NetworkInterface.writeHeader(stream, send);
+            NetworkInterface.readHeader(stream);
         }
 
         public void connectServer(string hostname)
