@@ -28,7 +28,7 @@ namespace Local_Messenger
     public partial class MainWindow : Window
     {
         public List<Person> chats = new List<Person>();
-        public Person me = new Person("Me", Dns.GetHostName());
+        public Person me = new Person("Me", Dns.GetHostAddresses(Dns.GetHostName())[2].ToString());
         Server server = new Server();
 
         public List<Message> sendQueue = new List<Message>();
@@ -38,7 +38,7 @@ namespace Local_Messenger
             InitializeComponent();
             readSavedMessages();
             refreshWindow();
-            Server_IP.Text = Dns.GetHostName();
+            Server_IP.Text = me.hostName;
         }
 
         public void refreshWindow()
@@ -171,8 +171,8 @@ namespace Local_Messenger
 
         private async Task receiveMessages(TcpClient connection)
         {
-            string ourHostName = Dns.GetHostName();
-            string hostName = Dns.GetHostEntry(((IPEndPoint)connection.Client.RemoteEndPoint).Address).HostName;
+            string ourHostName = me.hostName; //Dns.GetHostName();
+            string hostName = ((IPEndPoint)connection.Client.RemoteEndPoint).Address.ToString(); //Dns.GetHostEntry(((IPEndPoint)connection.Client.RemoteEndPoint).Address).HostName;
             NetworkStream client = connection.GetStream();
 
             NetworkHeader handshake = NetworkInterface.readHeader(client);
@@ -190,7 +190,7 @@ namespace Local_Messenger
                 return;
             }
 
-            if (handshake.fileName != hostName)
+            if (hostName.Contains(handshake.fileName) == false)
             {
                 System.Diagnostics.Debug.WriteLine(string.Format("Client: given hostname is not actual hostname: {0}->{1}", handshake.fileName, hostName));
                 connection.Close();

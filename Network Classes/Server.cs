@@ -21,7 +21,7 @@ namespace Local_Messenger
         public MainWindow window = null;
         public Server()
         {
-            ServerHostName = Dns.GetHostName();
+            ServerHostName = Dns.GetHostAddresses(Dns.GetHostName())[2].ToString();//  Dns.GetHostName();
         }
 
         public async Task startServer()
@@ -65,7 +65,7 @@ namespace Local_Messenger
 
         public async Task connectToClient(TcpClient connection)
         {
-            string hostName = Dns.GetHostEntry(((IPEndPoint)connection.Client.RemoteEndPoint).Address).HostName;
+            string hostName = ((IPEndPoint)connection.Client.RemoteEndPoint).Address.ToString(); //Dns.GetHostEntry(((IPEndPoint)connection.Client.RemoteEndPoint).Address).HostName;
             System.Diagnostics.Debug.WriteLine("Server: connected to " + hostName);
 
 
@@ -86,7 +86,7 @@ namespace Local_Messenger
                 return;
             }
 
-            if (handshake.fileName != hostName)
+            if (hostName.Contains(handshake.fileName) == false)
             {
                 System.Diagnostics.Debug.WriteLine(string.Format("Server: given hostname is not actual hostname: {0}->{1}", handshake.fileName, hostName));
                 connection.Close();
