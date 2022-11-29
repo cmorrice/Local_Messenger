@@ -70,7 +70,8 @@
                             FontSize="14"
                             BorderThickness="0"
                             Foreground="{StaticResource ButtonForeground}"
-                            Background="Transparent"/>
+                            Background="Transparent"
+                            Click="Start_Chat_Click"/>
                 </Border>
             </Grid>
 
@@ -92,19 +93,64 @@
                        Margin="5"
                        Grid.Column="0"/>
 
-                <Border Background="{StaticResource ButtonBackground}"
+                <Grid Name="Server_Buttons"
+                      ShowGridLines="True"
+                      Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.5*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Background="{StaticResource TextBoxBackground}"
+                            CornerRadius="20"
+                            Margin="5"
+                            Grid.Column="0">
+                        <TextBox x:Name="Server_IP"
+                                 Text="Server Hostname"
+                                 FontSize="16"
+                                 VerticalAlignment="Stretch"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalContentAlignment="Center"
+                                 HorizontalContentAlignment="Left"
+                                 BorderThickness="0"
+                                 Padding="15, 0, 0, 0"
+                                 Background="Transparent"
+                                 Foreground="{StaticResource TextBoxForeground}"/>
+                    </Border>
+
+                    <Border Background="{StaticResource ButtonBackground}"
                         CornerRadius="20"
-                        HorizontalAlignment="Right"
+                        HorizontalAlignment="Center"
                         Grid.Column="1"
                         Margin="5"
                         Padding="15, 0, 15, 0">
-                    <Button x:Name="Server_Toggle"
+                        <Button x:Name="Server_Connect"
+                            Content="Connect"
+                            FontSize="14"
+                            BorderThickness="0"
+                            Foreground="{StaticResource ButtonForeground}"
+                            Background="Transparent"
+                            Click="Server_Connect_Click"/>
+                    </Border>
+
+                    <Border Background="{StaticResource ButtonBackground}"
+                        CornerRadius="20"
+                        HorizontalAlignment="Right"
+                        Grid.Column="2"
+                        Margin="5"
+                        Padding="15, 0, 15, 0">
+                        <Button x:Name="Server_Toggle"
                             Content="Start Server"
                             FontSize="14"
                             BorderThickness="0"
                             Foreground="{StaticResource ButtonForeground}"
-                            Background="Transparent"/>
-                </Border>
+                            Background="Transparent"
+                            Click="Server_Toggle_Click"/>
+                    </Border>
+                </Grid>
+
+                
             </Grid>
 
 
@@ -172,7 +218,8 @@
                                 FontSize="14"
                                 BorderThickness="0"
                                 Foreground="{StaticResource ButtonForeground}"
-                                Background="Transparent"/>
+                                Background="Transparent"
+                                Click="Attachment_Button_Click"/>
                     </Border>
 
                     <Border Background="{StaticResource TextBoxBackground}"

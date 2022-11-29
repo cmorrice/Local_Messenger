@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.IO;
+using System.Diagnostics;
 
 namespace Local_Messenger
 {
@@ -26,16 +27,18 @@ namespace Local_Messenger
     /// </summary>
     public partial class MainWindow : Window
     {
-        public Person me = new Person("Me", "localhost");
         public List<Person> chats = new List<Person>();
+        public Person me = new Person("Me", Dns.GetHostName());
+        Server server = new Server();
+
+        public List<Message> sendQueue = new List<Message>();
+
         public MainWindow()
         {
             InitializeComponent();
             readSavedMessages();
             refreshWindow();
-
-            Task.Run(() => startServer());
-            Task.Run(() => startClient());
+            Server_IP.Text = Dns.GetHostName();
         }
 
         public void refreshWindow()
@@ -65,97 +68,293 @@ namespace Local_Messenger
             }
         }
 
-        public async Task startServer()
+        //public async Task startServer()
+        //{
+        //    TcpListener server = new TcpListener(IPAddress.Any, 18604);
+        //    // we set our IP address as server's address, and we also set the port: 18604
+
+        //    server.Start();  // this will start the server
+
+        //    //while (true)   //we wait for a connection
+        //    //{
+        //    //    TcpClient client = server.AcceptTcpClient();  //if a connection exists, the server will accept it
+        //    //    this.Dispatcher.Invoke(() =>
+        //    //    {
+        //    //        Server_Out.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
+        //    //    });
+
+        //    //    NetworkStream ns = client.GetStream(); //networkstream is used to send/receive messages
+
+        //    //    byte[] hello = new byte[100];   //any message must be serialized (converted to byte array)
+        //    //    hello = Encoding.Default.GetBytes("hello world");  //conversion string => byte array
+
+        //    //    ns.Write(hello, 0, hello.Length);     //sending the message
+
+        //    //    while (client.Connected)  //while the client is connected, we look for incoming messages
+        //    //    {
+        //    //        byte[] msg = new byte[1024];     //the messages arrive as byte array
+        //    //        ns.Read(msg, 0, msg.Length);   //the same networkstream reads the message sent by the client
+
+        //    //        this.Dispatcher.Invoke(() => { Server_Out.Text = Encoding.Default.GetString(msg); });
+        //    //        Console.WriteLine(Encoding.Default.GetString(msg)); //now , we write the message as string
+        //    //    }
+        //    //}
+
+        //    while (true)   //we wait for a connection
+        //    {
+        //        TcpClient client = server.AcceptTcpClient();  //if a connection exists, the server will accept it
+        //        this.Dispatcher.Invoke(() =>
+        //        {
+        //            Server_Out.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
+        //        });
+
+        //        NetworkStream ns = client.GetStream(); //networkstream is used to send/receive messages
+
+        //        while (client.Connected)  //while the client is connected, we look for incoming messages
+        //        {
+        //            NetworkHeader received = NetworkInterface.readHeader(ns);
+        //            if (received == null)
+        //            {
+        //                System.Diagnostics.Debug.WriteLine("Received == null");
+        //                continue;
+        //            }
+
+        //            this.Dispatcher.Invoke(() => { Server_Out.Text = received.fileName; });
+        //            System.Diagnostics.Debug.WriteLine(string.Format("Server Received: {0} -- {1} -- {2}", received.type.ToString(), received.payloadSize, received.fileName)); //now , we write the message as string
+        //        }
+        //    }
+        //}
+
+        public async Task startClient(string serverHostname)
         {
-            TcpListener server = new TcpListener(IPAddress.Any, 18604);
-            // we set our IP address as server's address, and we also set the port: 18604
-
-            server.Start();  // this will start the server
-
-            //while (true)   //we wait for a connection
-            //{
-            //    TcpClient client = server.AcceptTcpClient();  //if a connection exists, the server will accept it
-            //    this.Dispatcher.Invoke(() =>
-            //    {
-            //        Server_Out.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
-            //    });
-
-            //    NetworkStream ns = client.GetStream(); //networkstream is used to send/receive messages
-
-            //    byte[] hello = new byte[100];   //any message must be serialized (converted to byte array)
-            //    hello = Encoding.Default.GetBytes("hello world");  //conversion string => byte array
-
-            //    ns.Write(hello, 0, hello.Length);     //sending the message
-
-            //    while (client.Connected)  //while the client is connected, we look for incoming messages
-            //    {
-            //        byte[] msg = new byte[1024];     //the messages arrive as byte array
-            //        ns.Read(msg, 0, msg.Length);   //the same networkstream reads the message sent by the client
-
-            //        this.Dispatcher.Invoke(() => { Server_Out.Text = Encoding.Default.GetString(msg); });
-            //        Console.WriteLine(Encoding.Default.GetString(msg)); //now , we write the message as string
-            //    }
-            //}
-
-            while (true)   //we wait for a connection
+            TcpClient client = null;
+            try
             {
-                TcpClient client = server.AcceptTcpClient();  //if a connection exists, the server will accept it
-                this.Dispatcher.Invoke(() =>
-                {
-                    Server_Out.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
-                });
-
-                NetworkStream ns = client.GetStream(); //networkstream is used to send/receive messages
-
-                while (client.Connected)  //while the client is connected, we look for incoming messages
-                {
-                    NetworkHeader received = NetworkInterface.readHeader(ns);
-                    if (received == null)
-                    {
-                        System.Diagnostics.Debug.WriteLine("Received == null");
-                        continue;
-                    }
-
-                    this.Dispatcher.Invoke(() => { Server_Out.Text = received.fileName; });
-                    System.Diagnostics.Debug.WriteLine(string.Format("Server Received: {0} -- {1} -- {2}", received.type.ToString(), received.payloadSize, received.fileName)); //now , we write the message as string
-                }
+                client = new TcpClient(serverHostname, 18604);
             }
-        }
+            catch (Exception e)
+            {
+                Debug.WriteLine(serverHostname + " failed");
+                Debug.WriteLine(e);
+                this.Dispatcher.Invoke(() => { Server_IP.Text = "Failed"; });
+                return;
+            }
 
-        public async Task startClient()
-        {
-            await Task.Delay(1000);
-            TcpClient client = new TcpClient("127.0.0.1", 18604);
+            TcpListener clientServer = null;
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("Client: tcp listener started");
+                clientServer = new TcpListener(IPAddress.Any, 18605);
+
+                clientServer.Start();  // this will start the server
+                System.Diagnostics.Debug.WriteLine("Client: server started");
+
+                System.Diagnostics.Debug.WriteLine("Client: Waiting for server");
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(string.Format("Client: starting server failed {0}", e));
+                client.Close();
+                return;
+            }
+
             NetworkStream stream = client.GetStream();
 
+            // send the initial handshake
+            NetworkHeader handshake = new(MessageType.connect_e, (ulong) me.hostName.Length, me.hostName);
+            NetworkInterface.writeHeader(stream, handshake);
 
-            //byte[] hello = Encoding.Default.GetBytes("freaky friday");
+            if (NetworkInterface.readACK(stream) == NetworkInterface.ERROR)
+            {
+                Debug.WriteLine("startClient(): readACK() failed");
+                client.Close();
+                return;
+            }
 
-            //stream.Write(hello, 0, hello.Length);
 
-            //while (client.Connected)
+            // after handshake, set up the receive channel
+            try
+            {
+                TcpClient connection = clientServer.AcceptTcpClient();  //if a connection exists, the server will accept it
+
+                Debug.WriteLine(string.Format("Client: Server Connected: {0}", ((IPEndPoint)connection.Client.RemoteEndPoint).Address));
+
+                Task.Run(() => receiveMessages(connection));
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(string.Format("Client: failed to accept server: {0}", e));
+                client.Close();
+                return;
+            }
+
+
+
+
+            // send the messages --> first send a header then the message itself
+            //foreach (Message message in chats[0].messages)
             //{
-            //    byte[] msg = new byte[1024];
-            //    stream.Read(msg, 0, msg.Length);
-
-            //    this.Dispatcher.Invoke(() => { Client_Out.Text = Encoding.Default.GetString(msg); });
+            //    sendQueue.Add(message);
             //}
 
-            NetworkHeader send = new();
-            send.type = MessageType.connect_e;
-            send.payloadSize = 6;
-            send.fileName = "HELO SERVER Beeper";
+            while (true)
+            {
+                if (sendQueue.Count == 0)
+                {
+                    continue;
+                }
 
-            NetworkInterface.writeHeader(stream, send);
-            NetworkInterface.readHeader(stream);
-        }
+                Message message = sendQueue.First();
+                sendQueue.RemoveAt(0);
 
-        public void connectServer(string hostname)
-        {
-            string server = "127.0.0.1";
-            TcpClient client = new TcpClient(server, 18604);
+                byte[] payload = message.toBuffer();
+                NetworkHeader messageHeader = new(MessageType.send_e, (UInt64)payload.Length, "");
+                if (NetworkInterface.writeHeader(stream, messageHeader) == NetworkInterface.ERROR)
+                {
+                    Debug.WriteLine("startClient(): writeHeader failed");
+                    break;
+                }
+
+                if (NetworkInterface.writeNetworkData(stream, payload, payload.Length) == NetworkInterface.ERROR)
+                {
+                    Debug.WriteLine("startClient(): writeNetworkData failed");
+                    break;
+                }
+            }
+
             client.Close();
         }
+
+        private async Task receiveMessages(TcpClient connection)
+        {
+            string ourHostName = Dns.GetHostName();
+            string hostName = Dns.GetHostEntry(((IPEndPoint)connection.Client.RemoteEndPoint).Address).HostName;
+            NetworkStream client = connection.GetStream();
+
+            NetworkHeader handshake = NetworkInterface.readHeader(client);
+            if (handshake == null)
+            {
+                System.Diagnostics.Debug.WriteLine("Client: connectToClient(): readHeader failed");
+                return;
+            }
+
+            if (handshake.type != MessageType.connect_e)
+            {
+                System.Diagnostics.Debug.WriteLine("Client: header type is not connect_e");
+
+                connection.Close();
+                return;
+            }
+
+            if (handshake.fileName != hostName)
+            {
+                System.Diagnostics.Debug.WriteLine(string.Format("Client: given hostname is not actual hostname: {0}->{1}", handshake.fileName, hostName));
+                connection.Close();
+                return;
+            }
+
+            if (NetworkInterface.sendACK(client) == NetworkInterface.ERROR)
+            {
+                Debug.WriteLine("Client: connectToClient(): sendACK() failed");
+                connection.Close();
+                return;
+            }
+
+            while (connection.Connected)  //while the client is connected, we look for incoming messages
+            {
+                NetworkHeader premessage = NetworkInterface.readHeader(client);
+                if (premessage == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("Client: receiveMessages(): readHeader failed");
+                    break;
+                }
+
+                // this means that the server is giving us a message
+                if (premessage.type == MessageType.send_e)
+                {
+                    byte[] messageBytes = NetworkInterface.readNetworkData(client, (int)premessage.payloadSize);
+                    if (messageBytes == null)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Client: receiveMessages(): readNetworkData for messageBytes failed");
+                        break;
+                    }
+                    Message message = Message.fromBuffer(messageBytes);
+                    System.Diagnostics.Debug.WriteLine("Client: Message Received on Client"); //now , we write the message as string
+                    System.Diagnostics.Debug.WriteLine(message.toString()); //now , we write the message as string
+
+                    message.sender.addMessage(message);
+                    message.receiver.addMessage(message);
+                    refreshWindow();
+                }
+            }
+
+            connection.Close();
+        }
+
+        //private TcpClient setupReceive(string hostName)
+        //{
+        //    TcpListener server = null;
+        //    try
+        //    {
+        //        System.Diagnostics.Debug.WriteLine("Client: tcp listener started");
+        //        server = new TcpListener(IPAddress.Any, 18604);
+
+
+        //        // we set our IP address as server's address, and we also set the port: 18604
+
+        //        server.Start();  // this will start the server
+        //        System.Diagnostics.Debug.WriteLine("Client: server started");
+
+        //        System.Diagnostics.Debug.WriteLine("Client: Waiting for client");
+
+        //        TcpClient connection = server.AcceptTcpClient();  //if a connection exists, the server will accept it
+
+        //        Debug.WriteLine(string.Format("Client: Server Connected: {0}", ((IPEndPoint)connection.Client.RemoteEndPoint).Address));
+
+
+        //        // let the client run independently
+        //        Task.Run(() => { connectToClient(connection); });
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        System.Diagnostics.Debug.WriteLine(string.Format("Server: startServer(): failed {0}", e));
+        //    }
+
+
+
+
+
+
+
+
+
+
+
+        //    TcpClient client = null;
+        //    try
+        //    {
+        //        client = new TcpClient(hostName, 18605);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Debug.WriteLine(e);
+        //        return null;
+        //    }
+
+        //    NetworkStream stream = client.GetStream();
+
+
+        //    NetworkHeader handshake = new(MessageType.connect_e, (ulong)ServerHostName.Length, ServerHostName);
+        //    NetworkInterface.writeHeader(stream, handshake);
+
+        //    if (NetworkInterface.readACK(stream) == NetworkInterface.ERROR)
+        //    {
+        //        Debug.WriteLine("Server: setupSend(): readACK() failed");
+        //        return null;
+        //    }
+
+        //    return client;
+        //}
 
         private void readSavedMessages()
         {
@@ -182,7 +381,7 @@ namespace Local_Messenger
             temp1.addMessage(new Message(me, temp1, "HELLO MELO", DateTime.Parse("11/09/2022 11:09:52 PM")));
             temp1.addMessage(new Message(temp1, me, "this is melo's response", DateTime.Parse("11/10/2022 6:08:52 PM")));
             temp1.addMessage(new Message(me, temp1, "this is melo's response", DateTime.Parse("11/10/2022 6:09:52 PM")));
-            temp1.sendMessage(me, "I (me) SENT THIS!");
+            temp1.addMessage(new Message(me, temp1, "I (me) SENT THIS!", DateTime.Now));
 
             Person temp2 = new Person("ala", "Asus");
             temp2.addMessage(new Message(me, temp2, "dobre miejsce", DateTime.Parse("11/10/2022 3:28:33 PM")));
@@ -192,14 +391,16 @@ namespace Local_Messenger
             temp2.addMessage(new Message(temp2, me, "end ala", DateTime.Parse("11/10/2022 3:31:52 PM")));
             temp2.addMessage(new Message(me, temp2, "solo me", DateTime.Parse("11/10/2022 3:32:52 PM")));
             temp2.addMessage(new Message(temp2, me, "solo ala", DateTime.Parse("11/10/2022 3:33:52 PM")));
-            temp2.addMessage(new Message(me, temp2, new BitmapImage(new Uri("pack://application:,,,/Local Messenger;component/Media/Images/cat.jpg")), DateTime.Parse("11/10/2022 3:33:58 PM")));
+            //temp2.addMessage(new Message(me, temp2, new BitmapImage(new Uri("pack://application:,,,/Local Messenger;component/Media/Images/cat.jpg")), DateTime.Parse("11/10/2022 3:33:58 PM")));
             temp2.addMessage(new Message(temp2, me, "solo 2 ala", DateTime.Parse("11/10/2022 3:34:32 PM")));
             temp2.addMessage(new Message(me, temp2, "top me", DateTime.Parse("11/10/2022 3:34:52 PM")));
             temp2.addMessage(new Message(me, temp2, "middle me", DateTime.Parse("11/10/2022 3:35:52 PM")));
             temp2.addMessage(new Message(me, temp2, "bottom me", DateTime.Parse("11/14/2022 8:36:52 PM")));
             temp2.addMessage(new Message(me, temp2, "new bottom me", DateTime.Parse("11/14/2022 10:36:52 PM")));
             temp2.addMessage(temp2, me, "hello :)");
-            temp2.addMessage(new Message(temp2, me, new BitmapImage(new Uri("pack://application:,,,/Local Messenger;component/Media/Images/cat.jpg")), DateTime.Now));
+            //temp2.addMessage(new Message(temp2, me, new BitmapImage(new Uri("pack://application:,,,/Local Messenger;component/Media/Images/cat.jpg")), DateTime.Now));
+            //Search_Box.Text = temp2.messages[0].toString();
+
 
             Person temp3 = new Person("loseph", "Bing");
             temp3.addMessage(new Message(me, temp3, "jaeni", DateTime.Parse("10/6/2022 10:29:52 PM")));
@@ -256,5 +457,28 @@ namespace Local_Messenger
             }
         }
 
+        private void Server_Toggle_Click(object sender, RoutedEventArgs e)
+        {
+            server.window = this;
+            Task.Run(() => server.startServer());
+        }
+
+        private void Attachment_Button_Click(object sender, RoutedEventArgs e)
+        {
+            return;
+        }
+
+        private void Server_Connect_Click(object sender, RoutedEventArgs e)
+        {
+            string serverHostname = (string)Server_IP.Text;
+            Task.Run(() => startClient(serverHostname));
+        }
+
+        private void Start_Chat_Click(object sender, RoutedEventArgs e)
+        {
+            Person newPerson = new Person(Search_Box.Text, Server_IP.Text);
+            chats.Add(newPerson);
+            refreshWindow();
+        }
     }
 }

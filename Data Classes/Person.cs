@@ -7,12 +7,16 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace Local_Messenger
 {
     public class Person : INotifyPropertyChanged, IComparable<Person>
     {
+        private static Dictionary<string, Person> KNOWN_HOSTS = new();
+
         private string _name;
         public string name
         {
@@ -51,7 +55,7 @@ namespace Local_Messenger
 
         public List<Message> messages { get; }
 
-        public Person()
+        private Person()
         {
             contactPhoto = new BitmapImage(new Uri("pack://application:,,,/Local Messenger;component/Media/Images/cat.jpg"));
             messages = new List<Message>();
@@ -61,6 +65,23 @@ namespace Local_Messenger
         {
             this.name = name;
             this.hostName = hostName;
+
+            // add this person to the host list
+            KNOWN_HOSTS[this.hostName] = this;
+        }
+
+        public void addMessage(Message newMessage)
+        {
+            messages.Add(newMessage);
+        }
+
+        public void addMessage(Person sender, Person receiver, string content)
+        {
+            Message newMessage = new Message(sender, receiver, content, DateTime.Now);
+            messages.Add(newMessage);
+
+            MainWindow window = (MainWindow)Application.Current.MainWindow;
+            window.sendQueue.Add(newMessage);
         }
 
         public void sendMessage(Person sender, string content)
@@ -69,16 +90,7 @@ namespace Local_Messenger
             // then actually do the sending through the server
         }
 
-        public void addMessage(Person sender, Person receiver, string content)
-        {
-            Message newMessage = new Message(sender, receiver, content, DateTime.Now);
-            messages.Add(newMessage);
-        }
 
-        public void addMessage(Message newMessage)
-        {
-            messages.Add(newMessage);
-        }
 
         // search messages for messages containing the string
         public List<Message> searchMessages(string substr) 
@@ -102,6 +114,32 @@ namespace Local_Messenger
             return found;
         }
 
+        public static Person findHost(string hostName)
+        {
+            return KNOWN_HOSTS.GetValueOrDefault(hostName, null);
+        }
+
+        public static Person findOrCreateHost(string hostName)
+        {
+            Person host = findHost(hostName);
+            if (host == null)
+            {
+                //System.Diagnostics.Debug.WriteLine(string.Format("host: {0} y<{1}>uh not found...", hostName.Length, hostName));
+                //System.Diagnostics.Debug.WriteLine("Keys:");
+                //foreach (string key in KNOWN_HOSTS.Keys)
+                //{
+                //    System.Diagnostics.Debug.WriteLine(key);
+                //}
+
+                host = new Person(hostName, hostName);
+
+                // experimental for auto adding person into chat list
+                MainWindow window = (MainWindow)Application.Current.MainWindow;
+                window.chats.Add(host);
+            }
+
+            return host;
+        }
 
 
         // Default comparer for Person type.
@@ -162,6 +200,5 @@ namespace Local_Messenger
             }
             writer.WriteBase64StringValue(data);
         }
-
     }
 }

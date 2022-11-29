@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace Local_Messenger
 {
@@ -11,6 +14,7 @@ namespace Local_Messenger
     {
         disconnect_e,   // when the other disconnects
         connect_e,      // a connect request
+        send_e,
         acknowledge_e,  // an acknowledgement
         hash_e,         // a hash request
         upload_e,       // an upload request
@@ -24,6 +28,18 @@ namespace Local_Messenger
         public MessageType type;    // uint32_t is typically enum
         public UInt64 payloadSize;   // int64_t is typically ssize_t
         public string fileName;     // character array of up to 256 characters
+        
+        public NetworkHeader()
+        {
+
+        }
+
+        public NetworkHeader(MessageType type, UInt64 payloadSize, string fileName) : this()
+        {
+            this.type = type;
+            this.payloadSize = payloadSize;
+            this.fileName = fileName;
+        }
     }
 
     public class NetworkInterface
@@ -80,7 +96,7 @@ namespace Local_Messenger
             return NO_ERROR;
         }
 
-        private static int readACK(NetworkStream socket)
+        public static int readACK(NetworkStream socket)
         {
             MessageType acknowledgeMessage = MessageType.disconnect_e;
             byte[] message = null;
@@ -110,7 +126,7 @@ namespace Local_Messenger
             return NO_ERROR;
         }
 
-        private static int sendACK(NetworkStream socket)
+        public static int sendACK(NetworkStream socket)
         {
             MessageType acknowledgeMessage = MessageType.acknowledge_e;
             byte[] payload = BitConverter.GetBytes((UInt32) acknowledgeMessage);
@@ -191,9 +207,9 @@ namespace Local_Messenger
 
             try
             {
-                thisHeader.type = (MessageType) BitConverter.ToUInt32(thisBuffer, 0);
-                thisHeader.payloadSize = (UInt64) BitConverter.ToUInt64(thisBuffer, TYPE_SIZE);
-                thisHeader.fileName = Encoding.Default.GetString(thisBuffer.TakeLast(NAME_MAX).ToArray()); // could lead to overflow
+                thisHeader.type = (MessageType)BitConverter.ToUInt32(thisBuffer, 0);
+                thisHeader.payloadSize = (UInt64)BitConverter.ToUInt64(thisBuffer, TYPE_SIZE);
+                thisHeader.fileName = Encoding.Default.GetString(thisBuffer.TakeLast(NAME_MAX).Take((int) thisHeader.payloadSize).ToArray()); // could lead to overflow
             }
             catch (Exception e)
             {
@@ -202,6 +218,52 @@ namespace Local_Messenger
             }
 
             return thisHeader;
+        }
+
+        public static byte[] imageToBuffer(BitmapImage thisImage)
+        {
+            byte[] thisBuffer = null;
+
+            BitmapEncoder encoder = new BmpBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(thisImage));
+            using (MemoryStream ms = new MemoryStream())
+            {
+                encoder.Save(ms);
+                thisBuffer = ms.ToArray();
+            }
+
+            return thisBuffer;
+        }
+
+        // TODO
+        public static BitmapImage bufferToImage(byte[] thisBuffer)
+        {
+            ////// NEEDS TO BE PROPERLY IMPLEMENTED THIS DOES NOT WORK //////
+            ////// NEEDS TO BE PROPERLY IMPLEMENTED THIS DOES NOT WORK //////
+            ////// NEEDS TO BE PROPERLY IMPLEMENTED THIS DOES NOT WORK //////
+            ////// NEEDS TO BE PROPERLY IMPLEMENTED THIS DOES NOT WORK //////
+
+            BitmapImage thisImage = null;
+
+            using (MemoryStream ms = new MemoryStream(thisBuffer))
+            {
+                BitmapDecoder decoder = new BmpBitmapDecoder(ms, BitmapCreateOptions.None, BitmapCacheOption.Default);
+                BitmapSource source = decoder.Frames[0];
+
+                Image image = new Image();
+                image.Source = source;
+
+                using (MemoryStream bSource = new MemoryStream())
+                {
+                    BitmapEncoder encoder = new BmpBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(source));
+                    encoder.Save(bSource);
+                    //thisImage = new BitmapImage(bSource);
+                    thisImage = new BitmapImage(new Uri("pack://application:,,,/Local Messenger;component/Media/Images/cat.jpg"));
+                }
+            }
+
+            return thisImage;
         }
     }
 }
