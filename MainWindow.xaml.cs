@@ -68,68 +68,12 @@ namespace Local_Messenger
             }
         }
 
-        //public async Task startServer()
-        //{
-        //    TcpListener server = new TcpListener(IPAddress.Any, 18604);
-        //    // we set our IP address as server's address, and we also set the port: 18604
-
-        //    server.Start();  // this will start the server
-
-        //    //while (true)   //we wait for a connection
-        //    //{
-        //    //    TcpClient client = server.AcceptTcpClient();  //if a connection exists, the server will accept it
-        //    //    this.Dispatcher.Invoke(() =>
-        //    //    {
-        //    //        Server_Out.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
-        //    //    });
-
-        //    //    NetworkStream ns = client.GetStream(); //networkstream is used to send/receive messages
-
-        //    //    byte[] hello = new byte[100];   //any message must be serialized (converted to byte array)
-        //    //    hello = Encoding.Default.GetBytes("hello world");  //conversion string => byte array
-
-        //    //    ns.Write(hello, 0, hello.Length);     //sending the message
-
-        //    //    while (client.Connected)  //while the client is connected, we look for incoming messages
-        //    //    {
-        //    //        byte[] msg = new byte[1024];     //the messages arrive as byte array
-        //    //        ns.Read(msg, 0, msg.Length);   //the same networkstream reads the message sent by the client
-
-        //    //        this.Dispatcher.Invoke(() => { Server_Out.Text = Encoding.Default.GetString(msg); });
-        //    //        Console.WriteLine(Encoding.Default.GetString(msg)); //now , we write the message as string
-        //    //    }
-        //    //}
-
-        //    while (true)   //we wait for a connection
-        //    {
-        //        TcpClient client = server.AcceptTcpClient();  //if a connection exists, the server will accept it
-        //        this.Dispatcher.Invoke(() =>
-        //        {
-        //            Server_Out.Text = string.Format("Client Connected: {0}", ((IPEndPoint)client.Client.RemoteEndPoint).Address);
-        //        });
-
-        //        NetworkStream ns = client.GetStream(); //networkstream is used to send/receive messages
-
-        //        while (client.Connected)  //while the client is connected, we look for incoming messages
-        //        {
-        //            NetworkHeader received = NetworkInterface.readHeader(ns);
-        //            if (received == null)
-        //            {
-        //                System.Diagnostics.Debug.WriteLine("Received == null");
-        //                continue;
-        //            }
-
-        //            this.Dispatcher.Invoke(() => { Server_Out.Text = received.fileName; });
-        //            System.Diagnostics.Debug.WriteLine(string.Format("Server Received: {0} -- {1} -- {2}", received.type.ToString(), received.payloadSize, received.fileName)); //now , we write the message as string
-        //        }
-        //    }
-        //}
-
         public async Task startClient(string serverHostname)
         {
             TcpClient client = null;
             try
             {
+
                 client = new TcpClient(serverHostname, 18604);
             }
             catch (Exception e)
@@ -291,71 +235,6 @@ namespace Local_Messenger
             connection.Close();
         }
 
-        //private TcpClient setupReceive(string hostName)
-        //{
-        //    TcpListener server = null;
-        //    try
-        //    {
-        //        System.Diagnostics.Debug.WriteLine("Client: tcp listener started");
-        //        server = new TcpListener(IPAddress.Any, 18604);
-
-
-        //        // we set our IP address as server's address, and we also set the port: 18604
-
-        //        server.Start();  // this will start the server
-        //        System.Diagnostics.Debug.WriteLine("Client: server started");
-
-        //        System.Diagnostics.Debug.WriteLine("Client: Waiting for client");
-
-        //        TcpClient connection = server.AcceptTcpClient();  //if a connection exists, the server will accept it
-
-        //        Debug.WriteLine(string.Format("Client: Server Connected: {0}", ((IPEndPoint)connection.Client.RemoteEndPoint).Address));
-
-
-        //        // let the client run independently
-        //        Task.Run(() => { connectToClient(connection); });
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        System.Diagnostics.Debug.WriteLine(string.Format("Server: startServer(): failed {0}", e));
-        //    }
-
-
-
-
-
-
-
-
-
-
-
-        //    TcpClient client = null;
-        //    try
-        //    {
-        //        client = new TcpClient(hostName, 18605);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Debug.WriteLine(e);
-        //        return null;
-        //    }
-
-        //    NetworkStream stream = client.GetStream();
-
-
-        //    NetworkHeader handshake = new(MessageType.connect_e, (ulong)ServerHostName.Length, ServerHostName);
-        //    NetworkInterface.writeHeader(stream, handshake);
-
-        //    if (NetworkInterface.readACK(stream) == NetworkInterface.ERROR)
-        //    {
-        //        Debug.WriteLine("Server: setupSend(): readACK() failed");
-        //        return null;
-        //    }
-
-        //    return client;
-        //}
-
         private void readSavedMessages()
         {
             addTestMessages();
@@ -397,7 +276,7 @@ namespace Local_Messenger
             temp2.addMessage(new Message(me, temp2, "middle me", DateTime.Parse("11/10/2022 3:35:52 PM")));
             temp2.addMessage(new Message(me, temp2, "bottom me", DateTime.Parse("11/14/2022 8:36:52 PM")));
             temp2.addMessage(new Message(me, temp2, "new bottom me", DateTime.Parse("11/14/2022 10:36:52 PM")));
-            temp2.addMessage(temp2, me, "hello :)");
+            temp2.addMessage(new Message(temp2, me, "hello :)", DateTime.Now));
             //temp2.addMessage(new Message(temp2, me, new BitmapImage(new Uri("pack://application:,,,/Local Messenger;component/Media/Images/cat.jpg")), DateTime.Now));
             //Search_Box.Text = temp2.messages[0].toString();
 

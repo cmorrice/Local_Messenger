@@ -100,8 +100,6 @@ namespace Local_Messenger
             Array.Copy(senderName, 0, thisBuffer, INT_SIZE * 2, Math.Min(NAME_MAX, senderName.Length));
             Array.Copy(receiverName, 0, thisBuffer, INT_SIZE * 2 + NAME_MAX, Math.Min(NAME_MAX, receiverName.Length));
             BitConverter.GetBytes((Int64) this.sentTimeStamp.ToBinary()).CopyTo(thisBuffer, (INT_SIZE * 2) + (NAME_MAX * 2));
-            System.Diagnostics.Debug.WriteLine(string.Format("from {0}", this.sentTimeStamp.ToBinary()));
-            System.Diagnostics.Debug.WriteLine(string.Format("from {0}", DateTime.Now.ToBinary()));
 
 
             BitConverter.GetBytes((UInt32) this.type).CopyTo(thisBuffer, (INT_SIZE * 2) + (NAME_MAX * 2) + DATE_SIZE);
@@ -129,7 +127,6 @@ namespace Local_Messenger
 
             byte[] bub = new byte[DATE_SIZE];
             Buffer.BlockCopy(buffer, (INT_SIZE * 2) + NAME_MAX * 2, bub, 0, DATE_SIZE);
-            System.Diagnostics.Debug.WriteLine(string.Format("from {0}", BitConverter.ToInt64(bub)));
 
             DateTime sentTimeStamp = DateTime.FromBinary((Int64)BitConverter.ToInt64(bub));
             
