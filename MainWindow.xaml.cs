@@ -28,7 +28,7 @@ namespace Local_Messenger
     public partial class MainWindow : Window
     {
         public List<Person> chats = new List<Person>();
-        public Person me = new Person("Me", Dns.GetHostAddresses(Dns.GetHostName())[2].ToString());
+        public Person me = new Person("Me", Dns.GetHostAddresses(Dns.GetHostName())[3].ToString());
         Server server = new Server();
 
         public List<Message> sendQueue = new List<Message>();

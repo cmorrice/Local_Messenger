@@ -21,7 +21,11 @@ namespace Local_Messenger
         public MainWindow window = null;
         public Server()
         {
-            ServerHostName = Dns.GetHostAddresses(Dns.GetHostName())[2].ToString();//  Dns.GetHostName();
+            ServerHostName = Dns.GetHostAddresses(Dns.GetHostName())[3].ToString();//  Dns.GetHostName();
+            foreach (IPAddress dress in Dns.GetHostAddresses(Dns.GetHostName()))
+            {
+                Debug.WriteLine(dress.ToString());
+            }
         }
 
         public async Task startServer()

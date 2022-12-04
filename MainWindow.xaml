@@ -35,7 +35,7 @@
             </Grid.RowDefinitions>
 
             <Grid Name="Search_Start"
-                  ShowGridLines="True"
+                  ShowGridLines="False"
                   Grid.Column="0"
                   Grid.Row="0">
                 <Grid.ColumnDefinitions>
@@ -78,7 +78,7 @@
             <Grid Name="Name_Server"
                   Grid.Column="1"
                   Grid.Row="0"
-                  ShowGridLines="True">
+                  ShowGridLines="False">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
@@ -94,7 +94,7 @@
                        Grid.Column="0"/>
 
                 <Grid Name="Server_Buttons"
-                      ShowGridLines="True"
+                      ShowGridLines="False"
                       Grid.Column="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1.5*"/>
@@ -172,8 +172,8 @@
                     <TextBlock Grid.Column ="2" Text="Time" 
                 ="White"/>
                 </Grid> -->
-                <TextBlock x:Name="Server_Out" Text="Server Output" Background="CornflowerBlue"/>
-                <TextBlock x:Name="Client_Out" Text="Client Output" Background="PaleVioletRed"/>
+                <TextBlock x:Name="Server_Out" Text="Server Output" Background="CornflowerBlue" Visibility="Collapsed"/>
+                <TextBlock x:Name="Client_Out" Text="Client Output" Background="PaleVioletRed" Visibility="Collapsed"/>
             </ListView>
 
             <Grid x:Name="Messages_Area"
@@ -202,7 +202,7 @@
 
                 <Grid Name="Attach_Chat_Send"
                       Grid.Row="1"
-                      ShowGridLines="True">
+                      ShowGridLines="False">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="6*"/>
